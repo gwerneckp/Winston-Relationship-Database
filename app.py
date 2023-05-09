@@ -45,9 +45,11 @@ def search_person():
 @app.route('/get_person_info', methods=['GET'])
 def get_person_info():
     name = request.args.get('name', '')
-    result = api.get_person_info(name)
-    print(result)
-    return jsonify(result)
+    try:
+        result = api.get_person_info(name)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": 400, "message": str(e)}), 400
 
 
 @app.route('/graph_data', methods=['GET'])

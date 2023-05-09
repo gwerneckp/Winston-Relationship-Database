@@ -31,13 +31,13 @@ document
     })
       .then((data) => data.json())
       .then((jsonData) => {
-        const statusDiv = document.getElementById('relationship-status');
-        if(jsonData.status == 201){
-          statusDiv.classList.remove('error')
-          statusDiv.classList.add('success')
+        const statusDiv = document.getElementById("relationship-status");
+        if (jsonData.status == 201) {
+          statusDiv.classList.remove("error");
+          statusDiv.classList.add("success");
         } else {
-          statusDiv.classList.remove('success')
-          statusDiv.classList.add('error')
+          statusDiv.classList.remove("success");
+          statusDiv.classList.add("error");
         }
         statusDiv.innerText = jsonData.message;
       });
@@ -71,3 +71,29 @@ document
     });
     document.getElementById("person-info-results").innerHTML = infoHtml;
   });
+
+async function fetchAndPopulateDatalist(inputId, listId) {
+  const input = document.getElementById(inputId);
+  const dataList = document.getElementById(listId);
+
+  input.addEventListener("input", async () => {
+    const searchName = input.value;
+    const response = await fetch(`${apiUrl}/search?name=${searchName}`);
+    const data = await response.json();
+    const persons = data.persons;
+
+    // Clear previous options
+    dataList.innerHTML = "";
+
+    // Populate datalist with new options
+    persons.forEach((person) => {
+      const option = document.createElement("option");
+      option.value = person;
+      dataList.appendChild(option);
+    });
+  });
+}
+
+fetchAndPopulateDatalist("p1", "p1-list");
+fetchAndPopulateDatalist("p2", "p2-list");
+fetchAndPopulateDatalist("info-name", "info-name-list");
