@@ -1,12 +1,10 @@
-from flask import Flask, jsonify, request, render_template
-from SchoolAPI import AppAPI
+from flask import Flask, jsonify, render_template, request
+
+from neo4j_utils import NeoHandler
 
 app = Flask(__name__)
 
-api = AppAPI('neo4j://localhost:7687', 'neo4j', 'xxxxxxxx')
-
-
-# define template route
+api = NeoHandler('neo4j://localhost:7687', 'neo4j', 'xxxxxxxx')
 
 
 @app.route('/')
@@ -42,6 +40,7 @@ def search_person():
 def get_person_info():
     name = request.args.get('name', '')
     result = api.get_person_info(name)
+    print(result)
     return jsonify(result)
 
 

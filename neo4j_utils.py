@@ -1,7 +1,7 @@
 from neo4j import GraphDatabase
 
 
-class AppAPI:
+class NeoHandler:
     def __init__(self, uri: str, user: str, password: str):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
         self.cx = None
@@ -45,6 +45,19 @@ class AppAPI:
         cypher_query = "MATCH (p1:Person {name: $name})<-[r]->(p2:Person) RETURN p1, type(r), p2"
         result = self.execute_query(cypher_query, name=name)
 
+        if not result.peek():
+            cypher_query = "MATCH (p1:Person {name: $name}) RETURN p1"
+
+            result = self.execute_query(cypher_query, name=name)
+
+            if not result.peek():
+                return None
+
+            person_node = result.peek()["p1"]
+            person_properties = dict(person_node)
+
+            return {"person": person_properties, "relationships": []}
+
         # Extract person properties
         person_node = result.peek()["p1"]
         person_properties = dict(person_node)
@@ -67,6 +80,6 @@ class AppAPI:
 
 
 if __name__ == '__main__':
-    api = AppAPI("neo4j://localhost:7687", "neo4j", "xxxxxxxx")
+    api = NeoHandler("neo4j://localhost:7687", "neo4j", "xxxxxxxx")
 
     print(api.get_person_info(api.search("gabr")[0]))
