@@ -50,15 +50,28 @@ document
     const name = document.getElementById("info-name").value;
     const response = await fetch(`${apiUrl}/get_person_info?name=${name}`);
     const data = await response.json();
-    console.log(data);
-    let infoHtml = "";
-    Object.entries(data.person).forEach(([key, value]) => {
-      infoHtml += `<p>${key}: ${value}</p>`;
+
+    let infoHtml = `<h2>${data.person.name}</h2>`;
+    for (const [key, value] of Object.entries(data.person)) {
+      if (key !== "name") {
+        infoHtml += `<p>${
+          key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()
+        }: <b>${value}</b></p>`;
+      }
+    }
+    infoHtml += `<h3>Relationships:</h3>
+                <ul>`;
+
+    data.relationships.forEach((rel) => {
+      infoHtml += `<li>${rel.p1} <b>${rel.relationship.replace("_", " ")}</b> ${
+        rel.p2
+      }</li>`;
     });
-    data.relationships.forEach((record) => {
-      infoHtml += `<p>${record.p1} - ${record.relationship} - ${record.p2}</p>`;
-    });
-    document.getElementById("person-info-results").innerHTML = infoHtml;
+    infoHtml += "</ul>";
+
+    const results = document.getElementById("person-info-results");
+    results.innerHTML = infoHtml;
+    results.style.display = "block";
   });
 
 async function fetchAndPopulateDatalist(inputId, listId) {

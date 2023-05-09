@@ -25,7 +25,18 @@
     </p>
 
     <h1>Welcome to the Churchill Database</h1>
+    <div class="flex">
+      <div
+        id="graph-container"
+        style="width: 100%; height: 600px; border: 1px solid lightgray"
+      ></div>
 
+      <div
+        id="context-menu"
+        class="context-menu"
+        style="display: none; width: 40%; padding: 20px"
+      ></div>
+    </div>
     <h2>Create Person</h2>
     <form id="create-person-form">
       <input
@@ -94,14 +105,9 @@
 
       <button type="submit">Get Info</button>
     </form>
-    <div id="person-info-results"></div>
+    <div id="person-info-results" , style="display: none"></div>
 
-    <div id="context-menu" class="context-menu" style="display: none; height:30%"></div>
-
-    <div
-      id="graph-container"
-      style="width: 100%; height: 600px; border: 1px solid lightgray"
-    ></div>
+    <div style="padding: 10px"></div>
   </body>
 
   <script type="text/javascript" src="static/script.js"></script>
