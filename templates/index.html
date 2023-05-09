@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Churchill Database</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+  <p>Disclaimer: This graph of relationships in our school is created using public information and is intended solely
+    for educational purposes. We respect the privacy of all individuals and have taken steps to ensure that no
+    personally identifiable information is included. Please note that while we have made every effort to ensure the
+    accuracy and currency of the data, the information presented in the graph may not be up to date or 100% veridical.
+  </p>
+
+  <h1>Welcome to the Churchill Database</h1>
+
+  <h2>Create Person</h2>
+  <form id="create-person-form">
+    <input type="text" id="person-name" placeholder="Person Name" required>
+    <button type="submit">Create Person</button>
+  </form>
+
+  <h2>Create Relationship</h2>
+  <form id="create-relationship-form">
+    <input type="text" id="p1" placeholder="Person 1" required>
+    <input type="text" id="relationship" placeholder="Relationship" required>
+    <input type="text" id="p2" placeholder="Person 2" required>
+    <button type="submit">Create Relationship</button>
+  </form>
+
+  <h2>Search Person</h2>
+  <form id="search-person-form">
+    <input type="text" id="search-name" placeholder="Search Name">
+    <button type="submit">Search</button>
+  </form>
+  <div id="search-results"></div>
+
+  <h2>Get Person Info</h2>
+  <form id="get-person-info-form">
+    <input type="text" id="info-name" placeholder="Person Name">
+    <button type="submit">Get Info</button>
+  </form>
+  <div id="person-info-results"></div>
+
+  <script>
+    const apiUrl = 'http://localhost:5000';
+
+    $('#create-person-form').submit(async (e) => {
+      e.preventDefault();
+      const name = $('#person-name').val();
+      await fetch(`${apiUrl}/create_person`, {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+      alert('Person created');
+    });
+
+    $('#create-relationship-form').submit(async (e) => {
+      e.preventDefault();
+      const p1 = $('#p1').val();
+      const relationship = $('#relationship').val();
+      const p2 = $('#p2').val();
+      await fetch(`${apiUrl}/create_relationship`, {
+        method: 'POST',
+        body: JSON.stringify({ p1, relationship, p2 }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+      alert('Relationship created');
+    });
+
+    $('#search-person-form').submit(async (e) => {
+      e.preventDefault();
+      const name = $('#search-name').val();
+      const response = await fetch(`${apiUrl}/search?name=${name}`);
+      const data = await response.json();
+      const persons = data.persons;
+      $('#search-results').html(persons.join(', '));
+    });
+
+    $('#get-person-info-form').submit(async (e) => {
+      e.preventDefault();
+      const name = $('#info-name').val();
+      const response = await fetch(`${apiUrl}/get_person_info?name=${name}`);
+      const data = await response.json();
+      console.log(data);
+      let infoHtml = '';
+      Object.entries(data.person).forEach(([key, value]) => {
+        infoHtml += `<p>${key}: ${value}</p>`;
+      });
+      data.relationships.forEach(record => {
+        infoHtml += `<p>${record.p1} - ${record.relationship} - ${record.p2}</p>`;
+      });
+      $('#person-info-results').html(infoHtml);
+    });
+
+  </script>
+</body>
+
+</html>

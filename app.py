@@ -1,21 +1,23 @@
-from flask import Flask, jsonify, request
-from interactive import AppAPI
+from flask import Flask, jsonify, request, render_template
+from SchoolAPI import AppAPI
 
 app = Flask(__name__)
 
-api = AppAPI()
+api = AppAPI('neo4j://localhost:7687', 'neo4j', 'xxxxxxxx')
+
+
+# define template route
 
 
 @app.route('/')
 def index():
-    return "Welcome to the Churchill Database"
+    return render_template('index.html')
 
 
 @app.route('/create_person', methods=['POST'])
 def create_person():
     data = request.json
     api.create_person(**data)
-    from interactive import AppAPI
     return jsonify({"message": "Person created"}), 201
 
 
@@ -40,9 +42,7 @@ def search_person():
 def get_person_info():
     name = request.args.get('name', '')
     result = api.get_person_info(name)
-    formatted_result = [{"person1": record["p1"]["name"],
-                         "relationship": record["type(r)"], "person2": record["p2"]["name"]} for record in result]
-    return jsonify({"info": formatted_result})
+    return jsonify(result)
 
 
 if __name__ == '__main__':

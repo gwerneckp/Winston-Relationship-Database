@@ -69,4 +69,4 @@ class AppAPI:
 if __name__ == '__main__':
     api = AppAPI("neo4j://localhost:7687", "neo4j", "xxxxxxxx")
 
-
+    print(api.get_person_info(api.search("gabr")[0]))
