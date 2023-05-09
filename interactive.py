@@ -1,5 +1,8 @@
+import sys
 from os import system
 from time import sleep
+from typing import Optional, List, Tuple, Callable
+from SchoolAPI import AppAPI
 
 
 def clear():
@@ -8,27 +11,55 @@ def clear():
     print('\n')
 
 
-def do_nothing():
-    pass
-
-
-def error(msg):
+def error(msg: str):
     print(f"\033[91m{msg}\033[0m")
 
 
-def success(msg):
+def success(msg: str):
     print(f"\033[92m{msg}\033[0m")
 
 
-def info(msg):
+def info(msg: str):
     return f"\033[94m{msg}\033[0m"
 
 
+def choose_option(options: List[Tuple[str, Callable]], title='Options') -> Optional[any]:
+    """
+    Displays a list of options and handles user input to choose one.
+
+    Parameters
+    ----------
+    options : list of tuples
+        A list of tuples where the first element is the name of the option, and the second element is
+        the value to return if the option is chosen.
+
+    Returns
+    -------
+    Any or None
+        The value associated with the chosen option, or None if the user chose to go back.
+
+    """
+    print(f"{title}:")
+    for i, (name, _) in enumerate(options):
+        print(f"{i+1}. {name}")
+    print(f"{len(options) + 1}. Back")
+
+    while True:
+        try:
+            choice = int(input("Enter number: "))
+            if choice == len(options) + 1:
+                return None
+            if 1 <= choice <= len(options):
+                return options[choice-1][1]
+        except ValueError:
+            pass
+
+        error("Invalid choice. Please enter a number.")
 
 
 class Interactive:
     def __init__(self):
-        self.API = AppAPI()
+        self.API = AppAPI('neo4j://localhost:7687', 'neo4j', 'xxxxxxxx')
 
         while True:
             self.start_screen()
@@ -40,15 +71,16 @@ class Interactive:
         print("3. Search for a person")
         print("4. Exit")
         choice = int(input("Enter number: "))
-        match choice:
-            case 1:
-                self.create_person()
-            case 2:
-                self.create_relationship()
-            case 3:
-                self.person_info()
-            case 4:
-                exit()
+        if choice == 1:
+            self.create_person()
+        elif choice == 2:
+            self.create_relationship()
+        elif choice == 3:
+            self.person_info()
+        elif choice == 4:
+            exit()
+        else:
+            error("Invalid choice. Please try again.")
 
     def create_person(self):
         kwargs = {}
@@ -90,12 +122,12 @@ class Interactive:
         for k, v in kwargs.items():
             print(f"{k}: {info(v)}")
         if input(f'Are you sure you want to create {info(kwargs["name"])}? (y/n) ').lower() == 'n':
-            sleep()
+            sleep(1)
             return
 
         self.API.create_person(**kwargs)
 
-    def create_relationship(self, p1=None):
+    def create_relationship(self, p1: Optional[str] = None):
         if not p1:
             result = self.choose_person()
             if not result:
@@ -147,38 +179,41 @@ class Interactive:
 
         success('Relationships created')
         print('1. Create another relationship with this person')
-        print('2. Create a relationship with different person')
+        print('2. Create a relationship with a different person')
         print('3. Back')
 
         choice = int(input("Enter number: "))
-        {
-            1: lambda: self.create_relationship(p1=p1),
-            2: lambda: self.create_relationship(),
-            3: do_nothing
-        }[choice]()
+        if choice == 1:
+            self.create_relationship(p1=p1)
+        elif choice == 2:
+            self.create_relationship()
+        elif choice == 3:
+            pass
+        else:
+            error("Invalid choice. Please try again.")
 
     def person_info(self):
         name = self.choose_person()
-        result = self.API.get_person_info(name)
-        if result:
+        if name:
+            result = self.API.get_person_info(name)
             print(f"Relationships for {name}:")
-            for record in result:
-                print(f"{record['type(r)']} {record['p2']['name']}")
+            for record in result['relationships']:
+                print(f"{record['relationship']} {record['p2']}")
             input("Press enter to continue")
         return
 
-    def choose_person(self):
+    def choose_person(self) -> Optional[str]:
         name = input("Enter name: ")
         if name == '':
             error("Name cannot be empty")
             sleep(1)
-            return
+            return None
 
         result = self.API.search(name)
 
         if len(result) == 0:
             error("No results found")
-            return
+            return None
 
         person: str = ''
         if len(result) == 1:
@@ -186,7 +221,7 @@ class Interactive:
                 person = result[0]
             else:
                 sleep(1)
-                return
+                return None
 
         if len(result) > 1:
             print("Multiple results found:")
@@ -197,12 +232,11 @@ class Interactive:
                 person = result[choice-1]
             except:
                 error("Invalid choice")
-                sleep()
-                return
+                sleep(1)
+                return None
 
         success(f"Selected {person}")
         return person
 
 
-if __name__ == '__main__':
-    i = Interactive()
+i = Interactive()
