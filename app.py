@@ -45,5 +45,35 @@ def get_person_info():
     return jsonify(result)
 
 
+@app.route('/graph_data', methods=['GET'])
+def graph_data():
+    query = '''
+    MATCH (p1)-[r]->(p2)
+    RETURN p1.name AS p1, type(r) AS relationship, p2.name AS p2
+    '''
+    results = api.execute_query(query)
+    nodes = []
+    edges = []
+
+    for record in results:
+        p1 = record["p1"]
+        p2 = record["p2"]
+        relationship = record["relationship"]
+
+        if p1 not in nodes:
+            nodes.append(p1)
+
+        if p2 not in nodes:
+            nodes.append(p2)
+
+    # Direction is bi-directional
+    # How to make the arrows bi-directional?
+
+        edges.append(
+            {"from": p1, "to": p2, "label": relationship, "arrows": "to;from"})
+
+    return jsonify({"nodes": nodes, "edges": edges})
+
+
 if __name__ == '__main__':
     app.run(debug=True)

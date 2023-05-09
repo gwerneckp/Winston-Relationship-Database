@@ -5,14 +5,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Churchill Database</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0 1rem;
+      line-height: 1.6;
+    }
+
+    input,
+    button {
+      margin-bottom: 0.5rem;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    form {
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin-top: 2rem;
+    }
+
+    p {
+      color: #444;
+    }
+
+    #search-results,
+    #person-info-results {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid #ccc;
+    }
+  </style>
+
+  <link href="https://unpkg.com/vis-network@7.7.0/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="https://unpkg.com/vis-network@7.7.0/standalone/umd/vis-network.min.js"></script>
 </head>
 
 <body>
   <p>Disclaimer: This graph of relationships in our school is created using public information and is intended solely
     for educational purposes. We respect the privacy of all individuals and have taken steps to ensure that no
     personally identifiable information is included. Please note that while we have made every effort to ensure the
-    accuracy and currency of the data, the information presented in the graph may not be up to date or 100% veridical.
+    accuracy and currency of the data, the information presented in the graph may not be up to date or 100%
+    veridical.
   </p>
 
   <h1>Welcome to the Churchill Database</h1>
@@ -45,12 +84,14 @@
   </form>
   <div id="person-info-results"></div>
 
+  <div id="graph-container" style="width: 100%; height: 600px; border: 1px solid lightgray;"></div>
+
   <script>
     const apiUrl = 'http://localhost:5000';
 
-    $('#create-person-form').submit(async (e) => {
+    document.getElementById('create-person-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = $('#person-name').val();
+      const name = document.getElementById('person-name').value;
       await fetch(`${apiUrl}/create_person`, {
         method: 'POST',
         body: JSON.stringify({ name }),
@@ -61,11 +102,11 @@
       alert('Person created');
     });
 
-    $('#create-relationship-form').submit(async (e) => {
+    document.getElementById('create-relationship-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const p1 = $('#p1').val();
-      const relationship = $('#relationship').val();
-      const p2 = $('#p2').val();
+      const p1 = document.getElementById('p1').value;
+      const relationship = document.getElementById('relationship').value;
+      const p2 = document.getElementById('p2').value;
       await fetch(`${apiUrl}/create_relationship`, {
         method: 'POST',
         body: JSON.stringify({ p1, relationship, p2 }),
@@ -76,18 +117,18 @@
       alert('Relationship created');
     });
 
-    $('#search-person-form').submit(async (e) => {
+    document.getElementById('search-person-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = $('#search-name').val();
+      const name = document.getElementById('search-name').value;
       const response = await fetch(`${apiUrl}/search?name=${name}`);
       const data = await response.json();
       const persons = data.persons;
-      $('#search-results').html(persons.join(', '));
+      document.getElementById('search-results').innerText = persons.join(', ');
     });
 
-    $('#get-person-info-form').submit(async (e) => {
+    document.getElementById('get-person-info-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = $('#info-name').val();
+      const name = document.getElementById('info-name').value;
       const response = await fetch(`${apiUrl}/get_person_info?name=${name}`);
       const data = await response.json();
       console.log(data);
@@ -98,8 +139,101 @@
       data.relationships.forEach(record => {
         infoHtml += `<p>${record.p1} - ${record.relationship} - ${record.p2}</p>`;
       });
-      $('#person-info-results').html(infoHtml);
+      document.getElementById('person-info-results').innerHTML = infoHtml;
     });
+
+  </script>
+
+  <script defer type="text/javascript">
+    async function fetchGraphData() {
+      const response = await fetch(`${apiUrl}/graph_data`);
+      const data = await response.json();
+      const nodes = data.nodes.map((label, id) => ({ id, label }));
+      const edges = data.edges.map((edge) => ({
+        from: nodes.findIndex((node) => node.label === edge.from),
+        to: nodes.findIndex((node) => node.label === edge.to),
+        label: edge.label,
+        arrows: 'to',
+      }));
+
+      return { nodes, edges };
+    }
+
+    function drawGraph(nodes, edges) {
+      const container = document.getElementById('graph-container');
+      const data = {
+        nodes: new vis.DataSet(nodes),
+        edges: new vis.DataSet(edges),
+      };
+      const options = {
+        nodes: {
+          shape: 'circle',
+          size: 25,
+          font: {
+            size: 10,
+          },
+          borderWidth: 2,
+          borderWidthSelected: 4,
+          scaling: {
+            min: 25,
+            max: 50,
+            label: {
+              enabled: false,
+            },
+          },
+        },
+        edges: {
+
+          font: {
+            size: 10,
+            align: 'top',
+          },
+          smooth: {
+            enabled: true,
+            type: 'continuous',
+          },
+          arrows: {
+            to: {
+              enabled: true,
+              scaleFactor: 0.5,
+            },
+            middle: {
+              enabled: true,
+              scaleFactor: 0.5,
+              type: 'bar',
+            },
+          }
+        },
+        interaction: {
+          hover: true,
+          selectable: true,
+          selectConnectedEdges: false,
+        },
+        physics: {
+          enabled: false,
+        },
+      };
+
+      const network = new vis.Network(container, data, options);
+
+      network.on('click', (params) => {
+        if (params.nodes.length > 0) {
+          const nodeId = params.nodes[0];
+          const node = network.body.data.nodes.get(nodeId);
+          const nodeName = node.label;
+          const clickPosition = params.pointer.DOM;
+
+          alert(`Node ${nodeName} (ID: ${nodeId}) clicked at ${clickPosition.x}, ${clickPosition.y}`);
+        } else {
+          hideContextMenu();
+        }
+      });
+    }
+
+    (async function () {
+      const graphData = await fetchGraphData();
+      drawGraph(graphData.nodes, graphData.edges);
+    })();
 
   </script>
 </body>
