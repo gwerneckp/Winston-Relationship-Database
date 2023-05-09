@@ -44,17 +44,6 @@ document
   });
 
 document
-  .getElementById("search-person-form")
-  .addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.getElementById("search-name").value;
-    const response = await fetch(`${apiUrl}/search?name=${name}`);
-    const data = await response.json();
-    const persons = data.persons;
-    document.getElementById("search-results").innerText = persons.join(", ");
-  });
-
-document
   .getElementById("get-person-info-form")
   .addEventListener("submit", async (e) => {
     e.preventDefault();
