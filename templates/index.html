@@ -1,348 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Churchill Database</title>
+    <link href="static/style.css" rel="stylesheet" type="text/css" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Churchill Database</title>
-  <style>
-    /* Reset */
-    * {
-      box-sizing: border-box;
-    }
+    <link
+      href="https://unpkg.com/vis-network@7.7.0/styles/vis-network.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
 
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f8f9fa;
-      color: #444;
-    }
+  <body>
+    <p>
+      Disclaimer: This graph of relationships in our school is created using
+      public information and is intended solely for educational purposes. We
+      respect the privacy of all individuals and have taken steps to ensure that
+      no personally identifiable information is included. Please note that while
+      we have made every effort to ensure the accuracy and currency of the data,
+      the information presented in the graph may not be up to date or 100%
+      veridical.
+    </p>
 
-    /* Header */
-    h1 {
-      font-size: 2rem;
-      text-align: center;
-      margin: 2rem 0 1rem;
-    }
+    <h1>Welcome to the Churchill Database</h1>
 
-    /* Forms */
-    form {
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 0.25rem;
-      padding: 1rem;
-      margin-bottom: 2rem;
-    }
+    <h2>Create Person</h2>
+    <form id="create-person-form">
+      <input
+        type="text"
+        id="person-name"
+        placeholder="Person Name *"
+        required
+      />
+      <input type="text" id="person-grade" placeholder="Grade" />
+      <input
+        type="text"
+        id="person-school"
+        placeholder="School"
+        value="Lycée International de Londres Winston Churchill"
+      />
+      <input type="email" id="person-email" placeholder="Email" />
+      <input type="text" id="person-snapchat" placeholder="Snapchat" />
+      <input type="text" id="person-instagram" placeholder="Instagram" />
+      <input type="tel" id="person-phone" placeholder="Phone Number" />
+      <button type="submit">Create Person</button>
+    </form>
 
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-    }
+    <h2>Create Relationship</h2>
+    <form id="create-relationship-form">
+      <input type="text" id="p1" placeholder="Person 1" required />
+      <!-- <input type="text" id="relationship" placeholder="Relationship" required> -->
+      <select id="relationship" required>
+        <option value="" disabled selected>Select Relationship</option>
+        <option value="FRIENDS_WITH">Friends With</option>
+        <option value="DONT_LIKE">Don't Like</option>
+        <option value="GOT_WITH">Got With</option>
+        <option value="DATED">Dated</option>
+        <option value="DATING">Dating</option>
+      </select>
+      <input type="text" id="p2" placeholder="Person 2" required />
+      <div id="relationship-status"></div>
+      <button type="submit">Create Relationship</button>
+    </form>
 
-    input[type="text"],
-    select {
-      display: block;
-      width: 100%;
-      height: 2.5rem;
-      font-size: 1rem;
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-      border: 1px solid #ccc;
-      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-      margin-bottom: 0.5rem;
-    }
+    <h2>Search Person</h2>
+    <form id="search-person-form">
+      <input type="text" id="search-name" placeholder="Search Name" />
+      <button type="submit">Search</button>
+    </form>
+    <div id="search-results"></div>
 
-    input[type="text"]:focus,
-    select:focus {
-      outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
+    <h2>Get Person Info</h2>
+    <form id="get-person-info-form">
+      <input type="text" id="info-name" placeholder="Person Name" />
+      <button type="submit">Get Info</button>
+    </form>
+    <div id="person-info-results"></div>
 
-    button[type="submit"] {
-      display: block;
-      width: 100%;
-      height: 2.5rem;
-      font-size: 1rem;
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-      border: none;
-      background-color: #007bff;
-      color: #fff;
-      cursor: pointer;
-      transition: background-color 0.15s ease-in-out;
-      margin-top: 0.5rem;
-    }
+    <div
+      id="graph-container"
+      style="width: 100%; height: 600px; border: 1px solid lightgray"
+    ></div>
+  </body>
 
-    button[type="submit"]:hover {
-      background-color: #0069d9;
-    }
+  <script type="text/javascript" src="static/script.js"></script>
 
-    /* Graph */
-    #graph-container {
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 0.25rem;
-      margin-bottom: 2rem;
-    }
+  <script
+    defer
+    type="text/javascript"
+    src="https://unpkg.com/vis-network@7.7.0/standalone/umd/vis-network.min.js"
+  ></script>
 
-    /* Search results */
-    #search-results,
-    #person-info-results {
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 0.25rem;
-      padding: 1rem;
-      margin-top: 1rem;
-    }
-
-    #search-results ul,
-    #person-info-results ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    #search-results li,
-    #person-info-results li {
-      margin-bottom: 0.25rem;
-    }
-
-    /* Responsive styles */
-    @media screen and (min-width: 576px) {
-      body {
-        padding: 0 1rem;
-      }
-
-      form {
-        display: flex;
-        flex-wrap: wrap;
-      }
-
-      label {
-        width: 100%;
-        max-width: 15rem;
-        margin-right: 1rem;
-      }
-
-      input[type="text"],
-      select {
-        flex-grow: 1;
-        margin-right: 1rem;
-      }
-
-      button[type="submit"] {
-        flex-basis: calc(50% - 0.5rem);
-        margin-top: 1.5rem;
-        background-color: #007bff;
-        color: #fff;
-      }
-    }
-  </style>
-
-  <link href="https://unpkg.com/vis-network@7.7.0/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
-  <script type="text/javascript" src="https://unpkg.com/vis-network@7.7.0/standalone/umd/vis-network.min.js"></script>
-</head>
-
-<body>
-  <p>Disclaimer: This graph of relationships in our school is created using public information and is intended solely
-    for educational purposes. We respect the privacy of all individuals and have taken steps to ensure that no
-    personally identifiable information is included. Please note that while we have made every effort to ensure the
-    accuracy and currency of the data, the information presented in the graph may not be up to date or 100%
-    veridical.
-  </p>
-
-  <h1>Welcome to the Churchill Database</h1>
-
-  <h2>Create Person</h2>
-  <form id="create-person-form">
-    <input type="text" id="person-name" placeholder="Person Name" required>
-    <button type="submit">Create Person</button>
-  </form>
-
-  <h2>Create Relationship</h2>
-  <form id="create-relationship-form">
-    <input type="text" id="p1" placeholder="Person 1" required>
-    <!-- <input type="text" id="relationship" placeholder="Relationship" required> -->
-    <select id="relationship" required>
-      <option value="" disabled selected>Select Relationship</option>
-      <option value="FRIENDS_WITH">Friends With</option>
-      <option value="DONT_LIKE">Don't Like</option>
-      <option value="GOT_WITH">Got With</option>
-      <option value="DATED">Dated</option>
-      <option value="DATING">Dating</option>
-    </select>
-    <input type="text" id="p2" placeholder="Person 2" required>
-    <button type="submit">Create Relationship</button>
-  </form>
-
-  <h2>Search Person</h2>
-  <form id="search-person-form">
-    <input type="text" id="search-name" placeholder="Search Name">
-    <button type="submit">Search</button>
-  </form>
-  <div id="search-results"></div>
-
-  <h2>Get Person Info</h2>
-  <form id="get-person-info-form">
-    <input type="text" id="info-name" placeholder="Person Name">
-    <button type="submit">Get Info</button>
-  </form>
-  <div id="person-info-results"></div>
-
-  <div id="graph-container" style="width: 100%; height: 600px; border: 1px solid lightgray;"></div>
-
-  <script>
-    const apiUrl = 'http://localhost:5000';
-
-    document.getElementById('create-person-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('person-name').value;
-      await fetch(`${apiUrl}/create_person`, {
-        method: 'POST',
-        body: JSON.stringify({ name }),
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
-      alert('Person created');
-    });
-
-    document.getElementById('create-relationship-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const p1 = document.getElementById('p1').value;
-      const relationship = document.getElementById('relationship').value;
-      const p2 = document.getElementById('p2').value;
-      await fetch(`${apiUrl}/create_relationship`, {
-        method: 'POST',
-        body: JSON.stringify({ p1, relationship, p2 }),
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
-      alert('Relationship created');
-    });
-
-    document.getElementById('search-person-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('search-name').value;
-      const response = await fetch(`${apiUrl}/search?name=${name}`);
-      const data = await response.json();
-      const persons = data.persons;
-      document.getElementById('search-results').innerText = persons.join(', ');
-    });
-
-    document.getElementById('get-person-info-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('info-name').value;
-      const response = await fetch(`${apiUrl}/get_person_info?name=${name}`);
-      const data = await response.json();
-      console.log(data);
-      let infoHtml = '';
-      Object.entries(data.person).forEach(([key, value]) => {
-        infoHtml += `<p>${key}: ${value}</p>`;
-      });
-      data.relationships.forEach(record => {
-        infoHtml += `<p>${record.p1} - ${record.relationship} - ${record.p2}</p>`;
-      });
-      document.getElementById('person-info-results').innerHTML = infoHtml;
-    });
-
-  </script>
-
-  <script defer type="text/javascript">
-    async function fetchGraphData() {
-      const response = await fetch(`${apiUrl}/graph_data`);
-      const data = await response.json();
-      const nodes = data.nodes.map((label, id) => ({ id, label }));
-      const edges = data.edges.map((edge) => ({
-        from: nodes.findIndex((node) => node.label === edge.from),
-        to: nodes.findIndex((node) => node.label === edge.to),
-        label: edge.label,
-        arrows: 'to',
-      }));
-
-      return { nodes, edges };
-    }
-
-    function drawGraph(nodes, edges) {
-      const container = document.getElementById('graph-container');
-      const data = {
-        nodes: new vis.DataSet(nodes),
-        edges: new vis.DataSet(edges),
-      };
-      const options = {
-        nodes: {
-          shape: 'circle',
-          size: 25,
-          font: {
-            size: 10,
-          },
-          borderWidth: 2,
-          borderWidthSelected: 4,
-          scaling: {
-            min: 25,
-            max: 50,
-            label: {
-              enabled: false,
-            },
-          },
-        },
-        edges: {
-
-          font: {
-            size: 10,
-            align: 'top',
-          },
-          smooth: {
-            enabled: true,
-            type: 'continuous',
-          },
-          arrows: {
-            to: {
-              enabled: true,
-              scaleFactor: 0.5,
-            },
-            middle: {
-              enabled: true,
-              scaleFactor: 0.5,
-              type: 'bar',
-            },
-          }
-        },
-        interaction: {
-          hover: true,
-          selectable: true,
-          selectConnectedEdges: false,
-        },
-        physics: {
-          enabled: false,
-        },
-      };
-
-      const network = new vis.Network(container, data, options);
-
-      network.on('click', (params) => {
-        if (params.nodes.length > 0) {
-          const nodeId = params.nodes[0];
-          const node = network.body.data.nodes.get(nodeId);
-          const nodeName = node.label;
-          const clickPosition = params.pointer.DOM;
-
-          alert(`Node ${nodeName} (ID: ${nodeId}) clicked at ${clickPosition.x}, ${clickPosition.y}`);
-        } else {
-          hideContextMenu();
-        }
-      });
-    }
-
-    (async function () {
-      const graphData = await fetchGraphData();
-      drawGraph(graphData.nodes, graphData.edges);
-    })();
-
-  </script>
-</body>
-
+  <script defer type="text/javascript" src="static/graph.js"></script>
 </html>

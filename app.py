@@ -2,7 +2,9 @@ from flask import Flask, jsonify, render_template, request
 
 from neo4j_utils import NeoHandler
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_folder="./static",
+            template_folder="./templates")
 
 api = NeoHandler('neo4j://localhost:7687', 'neo4j', 'xxxxxxxx')
 
@@ -25,8 +27,12 @@ def create_relationship():
     p1 = data["p1"]
     relationship = data["relationship"]
     p2 = data["p2"]
-    api.relationship(p1, relationship, p2)
-    return jsonify({"message": "Relationship created"}), 201
+    try:
+        if api.relationship(p1, relationship, p2):
+            return jsonify({"status": 201, "message": "Relationship created"}), 201
+        return jsonify({'status': 400, 'message': 'Trying to create relationship with inexistent node'}), 400
+    except Exception as e:
+        return jsonify({"status": 400, "message": str(e)}), 400
 
 
 @app.route('/search', methods=['GET'])

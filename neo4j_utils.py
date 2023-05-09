@@ -35,11 +35,13 @@ class NeoHandler:
         if relationship not in valid_relationships:
             raise ValueError(f"Invalid relationship type: {relationship}")
 
-        cypher_query = "MATCH (p1:Person {name: $p1}), (p2:Person {name: $p2}) " \
-            "MERGE (p1)<-[:{relationship}]->(p2)"
+        cypher_query = f"MATCH (p1:Person {{name: $p1}}), (p2:Person {{name: $p2}}) " \
+            f"MERGE (p1)<-[r:{relationship}]->(p2)" \
+            f"RETURN type(r)"
 
-        self.execute_query(cypher_query, p1=p1, p2=p2,
-                           relationship=relationship)
+        result = self.execute_query(cypher_query, p1=p1, p2=p2)
+        # Check if the relationship was created
+        return bool(result.peek())
 
     def get_person_info(self, name: str):
         cypher_query = "MATCH (p1:Person {name: $name})<-[r]->(p2:Person) RETURN p1, type(r), p2"
@@ -82,4 +84,5 @@ class NeoHandler:
 if __name__ == '__main__':
     api = NeoHandler("neo4j://localhost:7687", "neo4j", "xxxxxxxx")
 
-    print(api.get_person_info(api.search("gabr")[0]))
+    print(api.relationship('Gabriel WERNECK-PAIVA',
+          'FRIENDS_WITH', 'Coline SELLIER'))
