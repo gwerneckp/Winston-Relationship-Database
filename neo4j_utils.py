@@ -7,17 +7,25 @@ class NeoHandler:
         self.cx = None
 
     def execute_query(self, cypher_query: str, **params):
-        if not self.cx:
-            self.cx = self.driver.session()
+        # if not self.cx:
+        #     self.cx = self.driver.session()
+        # try:
+        #     result = self.cx.run(cypher_query, **params)
+        # except Exception as e:
+        #     # Handle the error gracefully, for example by logging the error or
+        #     # returning an error message to the client
+        #     raise e
 
-        try:
-            result = self.cx.run(cypher_query, **params)
-        except Exception as e:
-            # Handle the error gracefully, for example by logging the error or
-            # returning an error message to the client
-            raise e
+        # return result
+        with self.driver.session() as session:
+            try:
+                result = session.run(cypher_query, **params)
+                # records = [record for record in result]
+                records = result.data()
+            except Exception as e:
+                raise e
 
-        return result
+        return records
 
     def create_person(self, **kwargs):
         name = kwargs.get('name')
@@ -41,27 +49,27 @@ class NeoHandler:
 
         result = self.execute_query(cypher_query, p1=p1, p2=p2)
         # Check if the relationship was created
-        return bool(result.peek())
+        return bool(result)
 
     def get_person_info(self, name: str):
         cypher_query = "MATCH (p1:Person {name: $name})<-[r]->(p2:Person) RETURN p1, type(r), p2"
         result = self.execute_query(cypher_query, name=name)
 
-        if not result.peek():
+        if not result:
             cypher_query = "MATCH (p1:Person {name: $name}) RETURN p1"
 
             result = self.execute_query(cypher_query, name=name)
 
-            if not result.peek():
+            if not result:
                 return None
 
-            person_node = result.peek()["p1"]
+            person_node = result[0]["p1"]
             person_properties = dict(person_node)
 
             return {"person": person_properties, "relationships": []}
 
         # Extract person properties
-        person_node = result.peek()["p1"]
+        person_node = result[0]["p1"]
         person_properties = dict(person_node)
 
         # Extract relationships

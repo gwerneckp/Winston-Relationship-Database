@@ -87,38 +87,7 @@ function drawGraph(nodes, edges) {
     if (params.nodes.length > 0) {
       const nodeId = params.nodes[0];
       const nodeName = network.body.data.nodes.get(nodeId).label;
-      const response = await fetch(
-        `${apiUrl}/get_person_info?name=${nodeName}`
-      );
-      const data = await response.json();
-      const menu = document.getElementById("context-menu");
-
-      // Generate formatted HTML from the data
-      // let html = `<h2>${data.person.name}</h2>
-      //               <p>Grade: ${data.person.grade}</p>
-      //               <p>School: ${data.person.school}</p>
-      //               <p>Email: ${data.person.email}</p>
-      //               <h3>Relationships:</h3>
-      //               <ul>`;
-
-      // Only name is required, other fields can be dynamically added
-      let html = `<h2>${data.person.name}</h2>`;
-      for (const [key, value] of Object.entries(data.person)) {
-        if (key !== "name") {
-          html += `<p>${key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}: <b>${value}</b></p>`;
-        }
-      }
-      html += `<h3>Relationships:</h3>
-                <ul>`;
-
-      data.relationships.forEach((rel) => {
-        html += `<li>${rel.p1} <b>${rel.relationship.replace('_', ' ')}</b> ${rel.p2}</li>`;
-      });
-      html += "</ul>";
-
-      // Update the context menu
-      menu.innerHTML = html;
-      menu.style.display = "block";
+      getResultsDisplayed(nodeName, "context-menu");
     }
   });
 }

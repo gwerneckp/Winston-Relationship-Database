@@ -48,31 +48,87 @@ document
   .addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("info-name").value;
-    const response = await fetch(`${apiUrl}/get_person_info?name=${name}`);
-    const data = await response.json();
+    getResultsDisplayed(name, "person-info-results");
+  });
 
-    let infoHtml = `<h2>${data.person.name}</h2>`;
-    for (const [key, value] of Object.entries(data.person)) {
-      if (key !== "name") {
-        infoHtml += `<p>${
-          key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()
-        }: <b>${value}</b></p>`;
-      }
+async function getResultsDisplayed(name, resultId) {
+  const response = await fetch(`${apiUrl}/get_person_info?name=${name}`);
+  const data = await response.json();
+  let infoHtml = `<h2>${data.person.name}</h2>`;
+  for (const [key, value] of Object.entries(data.person)) {
+    if (key !== "name") {
+      infoHtml += `<p>${
+        key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()
+      }: <b>${value}</b></p>`;
     }
-    infoHtml += `<h3>Relationships:</h3>
+  }
+  infoHtml += `<h3>Relationships:</h3>
                 <ul>`;
 
-    data.relationships.forEach((rel) => {
-      infoHtml += `<li>${rel.p1} <b>${rel.relationship.replace("_", " ")}</b> ${
-        rel.p2
-      }</li>`;
-    });
-    infoHtml += "</ul>";
-
-    const results = document.getElementById("person-info-results");
-    results.innerHTML = infoHtml;
-    results.style.display = "block";
+  data.relationships.forEach((rel) => {
+    infoHtml += `<li>${rel.p1} <b>${rel.relationship.replace("_", " ")}</b> ${
+      rel.p2
+    }</li>`;
   });
+  infoHtml += "</ul>";
+
+  // Add new relationship for person
+  // p1 is already defined as the person we are getting info for
+  infoHtml += /*html*/ `<h3>Add new relationship:</h3>
+                <form id="add-new-relationship-form"> 
+                <select id="relationship-context" required>
+                  <option value="" disabled selected>Select Relationship</option>
+                  <option value="FRIENDS_WITH">Friends With</option>
+                  <option value="DONT_LIKE">Don't Like</option>
+                  <option value="GOT_WITH">Got With</option>
+                  <option value="DATED">Dated</option>
+                  <option value="DATING">Dating</option>
+                </select>
+                <input
+                  list="p3-list"
+                  type="text"
+                  id="p3"
+                  placeholder="Person 2"
+                  required
+                />
+                <datalist id=p3-list></datalist>
+                <button id=submit-relationship-menu>Add Relationship</button>
+                </form>`;
+
+  const results = document.getElementById(resultId);
+  results.innerHTML = infoHtml;
+  results.style.display = "block";
+  fetchAndPopulateDatalist("p3", "p3-list");
+  document
+    .getElementById("submit-relationship-menu")
+    .addEventListener("click", async (e) => {
+      e.preventDefault();
+      const relationship = document.getElementById(
+        "relationship-context"
+      ).value;
+      const p2 = document.getElementById("p3").value;
+      const p1 = name;
+      const response = await addNewRelationship(p1, relationship, p2);
+      if (response.status == 201) {
+        fetchAndDraw();
+        getResultsDisplayed(name, resultId);
+      } else {
+        alert(JSON.stringify(response));
+      }
+    });
+}
+
+async function addNewRelationship(p1, relationship, p2) {
+  const dataJson = await fetch(`${apiUrl}/create_relationship`, {
+    method: "POST",
+    body: JSON.stringify({ p1, relationship, p2 }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((data) => data.json());
+
+  return dataJson;
+}
 
 async function fetchAndPopulateDatalist(inputId, listId) {
   const input = document.getElementById(inputId);
