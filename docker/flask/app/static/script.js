@@ -1,11 +1,9 @@
-const apiUrl = "http://localhost:5000";
-
 document
   .getElementById("create-person-form")
   .addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("person-name").value;
-    await fetch(`${apiUrl}/create_person`, {
+    await fetch("/create_person", {
       method: "POST",
       body: JSON.stringify({ name }),
       headers: {
@@ -22,7 +20,7 @@ document
     const p1 = document.getElementById("p1").value;
     const relationship = document.getElementById("relationship").value;
     const p2 = document.getElementById("p2").value;
-    await fetch(`${apiUrl}/create_relationship`, {
+    await fetch("/create_relationship", {
       method: "POST",
       body: JSON.stringify({ p1, relationship, p2 }),
       headers: {
@@ -35,7 +33,7 @@ document
         if (jsonData.status == 201) {
           statusDiv.classList.remove("error");
           statusDiv.classList.add("success");
-          fetchAndDraw()
+          fetchAndDraw();
         } else {
           statusDiv.classList.remove("success");
           statusDiv.classList.add("error");
@@ -53,7 +51,7 @@ document
   });
 
 async function getResultsDisplayed(name, resultId) {
-  const response = await fetch(`${apiUrl}/get_person_info?name=${name}`);
+  const response = await fetch("/get_person_info?name=${name}");
   const data = await response.json();
   let infoHtml = `<h2>${data.person.name}</h2>`;
   for (const [key, value] of Object.entries(data.person)) {
@@ -98,10 +96,10 @@ async function getResultsDisplayed(name, resultId) {
   infoHtml += /*html*/ `<h3>Add new relationship:</h3>
                 <form id="add-new-relationship-form"> 
                 <select id="relationship-context" required>
-                  <option value="" disabled selected>Select Relationship</option>
+                  <option value="" disabled>Select Relationship</option>
                   <option value="FRIENDS_WITH">Friends With</option>
                   <option value="DONT_LIKE">Don't Like</option>
-                  <option value="GOT_WITH">Got With</option>
+                  <option value="GOT_WITH" selected>Got With</option>
                   <option value="DATED">Dated</option>
                   <option value="DATING">Dating</option>
                 </select>
@@ -140,7 +138,7 @@ async function getResultsDisplayed(name, resultId) {
 }
 
 async function addNewRelationship(p1, relationship, p2) {
-  const dataJson = await fetch(`${apiUrl}/create_relationship`, {
+  const dataJson = await fetch("/create_relationship", {
     method: "POST",
     body: JSON.stringify({ p1, relationship, p2 }),
     headers: {
@@ -157,7 +155,7 @@ async function fetchAndPopulateDatalist(inputId, listId) {
 
   input.addEventListener("input", async () => {
     const searchName = input.value;
-    const response = await fetch(`${apiUrl}/search?name=${searchName}`);
+    const response = await fetch("/search?name=${searchName}");
     const data = await response.json();
     const persons = data.persons;
 

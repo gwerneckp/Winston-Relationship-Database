@@ -6,8 +6,16 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5000:5000
+    volumes:
+      - ./docker/flask/app:/app
+    depends_on:
+      neo4j:
+        condition: service_healthy
+
   neo4j:
-    image: neo4j-image
+    build:
+      context: ./docker/neo4j
+      dockerfile: Dockerfile
     ports:
       - 7474:7474
       - 7473:7473
@@ -16,3 +24,8 @@ services:
       - ./data:/data
     environment:
       - NEO4J_AUTH=neo4j/xxxxxxxx
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1" ]
+      interval: 5s
+      start_period: 10s
+      retries: 5

@@ -1,5 +1,5 @@
 async function fetchGraphData() {
-  const response = await fetch(`${apiUrl}/graph_data`);
+  const response = await fetch('/graph_data');
   const data = await response.json();
   const nodes = data.nodes.map((label, id) => ({ id, label }));
   const edges = data.edges.map((edge) => ({
@@ -62,7 +62,19 @@ function drawGraph(nodes, edges) {
       selectConnectedEdges: false,
     },
     physics: {
-      enabled: false,
+      enabled: true,
+      barnesHut: {
+        // gravitationalConstant: -2000,
+        // centralGravity: 0.1,
+        // springLength: 100,
+        // springConstant: 0.04,
+        // damping: 0.09,
+        avoidOverlap: 0.1,
+      },
+      // maxVelocity: 50,
+      // minVelocity: 0.1,
+      solver: "barnesHut",
+      // timestep: 0.5,
     },
   };
 
