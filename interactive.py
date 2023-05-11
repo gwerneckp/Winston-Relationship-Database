@@ -3,7 +3,7 @@ from os import system
 from time import sleep
 from typing import Callable, List, Optional, Tuple
 
-from neo4j_utils import NeoHandler
+from docker.flask.app.neo4j_utils import NeoHandler
 
 
 def error(msg: str):

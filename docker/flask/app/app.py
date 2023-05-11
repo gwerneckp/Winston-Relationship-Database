@@ -6,7 +6,7 @@ app = Flask(__name__,
             static_folder="./static",
             template_folder="./templates")
 
-api = NeoHandler('neo4j://localhost:7687', 'neo4j', 'xxxxxxxx')
+api = NeoHandler('neo4j://neo4j:7687', 'neo4j', 'xxxxxxxx')
 
 
 @app.route('/')
@@ -56,6 +56,7 @@ def get_person_info():
 def graph_data():
     query = '''
     MATCH (p1)-[r]->(p2)
+    WHERE type(r) IN ['GOT_WITH', 'DATED', 'DATING']
     RETURN p1.name AS p1, type(r) AS relationship, p2.name AS p2
     '''
     results = api.execute_query(query)
@@ -84,4 +85,4 @@ def graph_data():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
