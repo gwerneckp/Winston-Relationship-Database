@@ -35,6 +35,7 @@ document
         if (jsonData.status == 201) {
           statusDiv.classList.remove("error");
           statusDiv.classList.add("success");
+          fetchAndDraw()
         } else {
           statusDiv.classList.remove("success");
           statusDiv.classList.add("error");
@@ -65,11 +66,31 @@ async function getResultsDisplayed(name, resultId) {
   infoHtml += `<h3>Relationships:</h3>
                 <ul>`;
 
+  // Get relationships by type
+  const relationshipsByType = {};
+
   data.relationships.forEach((rel) => {
-    infoHtml += `<li>${rel.p1} <b>${rel.relationship.replace("_", " ")}</b> ${
-      rel.p2
-    }</li>`;
+    if (relationshipsByType[rel.relationship]) {
+      relationshipsByType[rel.relationship].push(rel);
+    } else {
+      relationshipsByType[rel.relationship] = [rel];
+    }
   });
+
+  // Draw relationships by type
+  for (const [key, value] of Object.entries(relationshipsByType)) {
+    infoHtml += `<h4>${key.replace("_", " ")}:</h4>`;
+    for (const rel of value) {
+      infoHtml += /*html*/ `<li><b>${rel.p2}</b></li>`;
+    }
+  }
+
+  // data.relationships.forEach((rel) => {
+  //   infoHtml += /*html*/ `<li>${rel.p1} <b>${rel.relationship.replace(
+  //     "_",
+  //     " "
+  //   )}</b> ${rel.p2}</li>`;
+  // });
   infoHtml += "</ul>";
 
   // Add new relationship for person
