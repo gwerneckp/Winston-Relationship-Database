@@ -1,17 +1,5 @@
 version: "3"
 services:
-  app:
-    build:
-      context: ./docker/flask
-      dockerfile: Dockerfile
-    ports:
-      - 5000:5000
-    volumes:
-      - ./docker/flask/app:/app
-    depends_on:
-      neo4j:
-        condition: service_healthy
-
   neo4j:
     build:
       context: ./docker/neo4j
@@ -29,3 +17,15 @@ services:
       interval: 5s
       start_period: 10s
       retries: 5
+
+  flask:
+    build:
+      context: ./docker/flask
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - ./docker/flask/app:/app
+    depends_on:
+      neo4j:
+        condition: service_healthy
