@@ -12,3 +12,4 @@ VOLUME /data
 
 # Set the entry point
 CMD ["neo4j", "start"]
+
