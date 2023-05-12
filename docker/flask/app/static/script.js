@@ -51,7 +51,7 @@ document
   });
 
 async function getResultsDisplayed(name, resultId) {
-  const response = await fetch("/get_person_info?name=${name}");
+  const response = await fetch(`/get_person_info?name=${name}`);
   const data = await response.json();
   let infoHtml = `<h2>${data.person.name}</h2>`;
   for (const [key, value] of Object.entries(data.person)) {
@@ -155,7 +155,7 @@ async function fetchAndPopulateDatalist(inputId, listId) {
 
   input.addEventListener("input", async () => {
     const searchName = input.value;
-    const response = await fetch("/search?name=${searchName}");
+    const response = await fetch(`/search?name=${searchName}`);
     const data = await response.json();
     const persons = data.persons;
 
