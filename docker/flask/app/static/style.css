@@ -31,6 +31,7 @@ label {
   margin-bottom: 0.5rem;
 }
 
+textarea,
 input,
 select {
   display: block;
@@ -44,6 +45,7 @@ select {
   margin-bottom: 0.5rem;
 }
 
+textarea:focus,
 input:focus,
 select:focus {
   outline: none;

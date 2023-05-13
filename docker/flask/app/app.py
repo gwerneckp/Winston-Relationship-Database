@@ -1,17 +1,68 @@
 from flask import Flask, jsonify, render_template, request
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, set_access_cookies, get_jwt_identity, get_jwt
+from functools import wraps
 from neo4j_utils import NeoHandler
+from datetime import timedelta
 
 app = Flask(__name__,
             static_folder="./static",
             template_folder="./templates")
+# Replace with your own secret key
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=3)
+
+jwt = JWTManager(app)
+
+
+def requires_edit_permission(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        current_user = get_jwt_identity()
+        if current_user.get('permissions') != 'edit':
+            return jsonify({'message': 'Insufficient permissions'}), 403
+        return func(*args, **kwargs)
+    return decorated_function
+
 
 api = NeoHandler('neo4j://neo4j:7687', 'neo4j', 'xxxxxxxx')
 
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
+@app.route('/auth', methods=['POST'])
+def authenticate():
+    username = request.json.get('username', None)
+    password = request.json.get('password', None)
+
+    if f'{username}:{password}' in [
+        'admin:secretpass',
+    ]:
+        access_token = create_access_token(identity={
+            'username': username,
+            'permissions': 'edit'
+        })
+
+        resp = jsonify({'access_token': access_token})
+        set_access_cookies(resp, access_token)
+
+        return resp, 200
+
+    return jsonify({'message': 'Invalid credentials'}), 401
+
+
 @app.route('/')
 @app.route('/index')
+@jwt_required(optional=True)
 def index():
-    return render_template('index.html')
+    jwt = get_jwt_identity()
+    if jwt:
+        if jwt['permissions'] == 'edit':
+            return render_template('index.html')
+    return render_template('view.html')
 
 
 @app.route('/disclaimer')
@@ -20,6 +71,8 @@ def disclaimer():
 
 
 @app.route('/create_person', methods=['POST'])
+@jwt_required()
+@requires_edit_permission
 def create_person():
     data = request.json
     api.create_person(**data)
@@ -27,6 +80,8 @@ def create_person():
 
 
 @app.route('/create_relationship', methods=['POST'])
+@jwt_required()
+@requires_edit_permission
 def create_relationship():
     data = request.json
     p1 = data["p1"]
@@ -41,6 +96,8 @@ def create_relationship():
 
 
 @app.route('/delete_relationship', methods=['POST'])
+@jwt_required()
+@requires_edit_permission
 def delete_relationship():
     data = request.json
     p1 = data["p1"]
