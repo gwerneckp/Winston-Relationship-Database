@@ -2,7 +2,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, set_access_cookies, get_jwt_identity, get_jwt
 from functools import wraps
 from neo4j_utils import NeoHandler
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 app = Flask(__name__,
             static_folder="./static",
@@ -39,9 +39,9 @@ def authenticate():
     username = request.json.get('username', None)
     password = request.json.get('password', None)
 
-    if f'{username}:{password}' in [
-        'admin:secretpass',
-    ]:
+    query = 'MATCH (u:User {username: $username, password: $password}) RETURN u'
+    result = api.execute_query(query, username=username, password=password)
+    if result:
         access_token = create_access_token(identity={
             'username': username,
             'permissions': 'edit'
@@ -167,11 +167,12 @@ def suggestion():
     message = request.json.get('message', None)
     ip = request.remote_addr
     user_agent = request.headers.get('User-Agent')
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if suggestion:
-        cypherquery = 'CREATE (s:Suggestion {message: $message, ip: $ip, user_agent: $user_agent})'
+        cypherquery = 'CREATE (s:Suggestion {message: $message, ip: $ip, user_agent: $user_agent, timestamp: $timestamp})'
 
         api.execute_query(cypherquery, message=message,
-                          ip=ip, user_agent=user_agent)
+                          ip=ip, user_agent=user_agent, timestamp=timestamp)
 
         return jsonify({"status": 201, "message": "Suggestion created"}), 201
 

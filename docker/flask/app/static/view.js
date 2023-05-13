@@ -1,3 +1,15 @@
+function getCookie(name) {
+  var start = document.cookie.indexOf(name + "=");
+  var len = start + name.length + 1;
+  if (!start && name != document.cookie.substring(0, name.length)) {
+    return null;
+  }
+  if (start == -1) return null;
+  var end = document.cookie.indexOf(";", len);
+  if (end == -1) end = document.cookie.length;
+  return unescape(document.cookie.substring(len, end));
+}
+
 async function getResultsDisplayed(name, resultId) {
   const response = await fetch(`/get_person_info?name=${name}`, {
     credentials: "same-origin",
@@ -52,7 +64,7 @@ async function getResultsDisplayed(name, resultId) {
 document.getElementById("submit-suggestion").onclick = async () => {
   const message = document.getElementById("suggestion").value;
 
-  const response = await fetch(`/suggest`, {
+  const response = await fetch(`/suggestion`, {
     credentials: "same-origin",
     method: "POST",
     headers: {
@@ -63,7 +75,7 @@ document.getElementById("submit-suggestion").onclick = async () => {
   });
 
   const suggestionStatus = document.getElementById("suggestion-status");
-  if (response.status === 200) {
+  if (response.status === 201) {
     document.getElementById("suggestion").value = "";
     suggestionStatus.innerHTML = "Suggestion submitted!";
     suggestionStatus.style.backgroundColor = "#94d6a4";
