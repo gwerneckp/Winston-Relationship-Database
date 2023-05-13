@@ -51,6 +51,15 @@ class NeoHandler:
         # Check if the relationship was created
         return bool(result)
 
+    def delete_relationship(self, p1: str, relationship: str, p2: str):
+        cypher_query = f"MATCH (p1:Person {{name: $p1}})-[r:{relationship}]->(p2:Person {{name: $p2}}) " \
+            f"DELETE r " \
+            f"RETURN type(r)"
+
+        result = self.execute_query(cypher_query, p1=p1, p2=p2)
+        # Check if the relationship was created
+        return bool(result)
+
     def get_person_info(self, name: str):
         cypher_query = "MATCH (p1:Person {name: $name})<-[r]->(p2:Person) RETURN p1, type(r), p2"
         result = self.execute_query(cypher_query, name=name)

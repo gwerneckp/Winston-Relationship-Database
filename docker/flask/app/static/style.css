@@ -159,5 +159,28 @@ button:hover {
     border: 1px solid #ccc;
     height: 600px;
     overflow-y: auto; /* add scrollbar if content overflows */
+    width: 40%;
+    padding: 20px;
   }
+
+  /* when screen is small, results 100% */
+  @media screen and (max-width: 576px) {
+    .results {
+      width: 100%;
+    }
+  }
+}
+
+.delete-button {
+  margin: 0px 0px 5px 10px;
+  border-radius: 0.25rem;
+  font-weight: bold;
+  background-color: #d69494;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.delete-button:hover {
+  background-color: #c66b6b;
 }

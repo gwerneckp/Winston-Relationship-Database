@@ -23,7 +23,7 @@ services:
       context: ./docker/flask
       dockerfile: Dockerfile
     ports:
-      - 5000:5000
+      - 443:5443
     volumes:
       - ./docker/flask/app:/app
     depends_on:

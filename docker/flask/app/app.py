@@ -9,8 +9,10 @@ api = NeoHandler('neo4j://neo4j:7687', 'neo4j', 'xxxxxxxx')
 
 
 @app.route('/')
+@app.route('/index')
 def index():
     return render_template('index.html')
+
 
 @app.route('/disclaimer')
 def disclaimer():
@@ -34,6 +36,21 @@ def create_relationship():
         if api.relationship(p1, relationship, p2):
             return jsonify({"status": 201, "message": "Relationship created"}), 201
         return jsonify({'status': 400, 'message': 'Trying to create relationship with inexistent node'}), 400
+    except Exception as e:
+        return jsonify({"status": 400, "message": str(e)}), 400
+
+
+@app.route('/delete_relationship', methods=['POST'])
+def delete_relationship():
+    data = request.json
+    p1 = data["p1"]
+    relationship = data["relationship"]
+    p2 = data["p2"]
+    try:
+        if api.delete_relationship(p1, relationship, p2):
+            return jsonify({"status": 201, "message": "Relationship deleted"}), 201
+        return jsonify({'status': 400, 'message': 'Trying to delete relationship with inexistent node'}), 400
+
     except Exception as e:
         return jsonify({"status": 400, "message": str(e)}), 400
 

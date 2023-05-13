@@ -75,13 +75,27 @@ async function getResultsDisplayed(name, resultId) {
     }
   });
 
-  // Draw relationships by type
-  for (const [key, value] of Object.entries(relationshipsByType)) {
-    infoHtml += `<h4>${key.replace("_", " ")}:</h4>`;
-    for (const rel of value) {
-      infoHtml += /*html*/ `<li><b>${rel.p2}</b></li>`;
+  // This was added to only show relatiohsips of type: GOT_WITH, DATED, DATING
+  const acceptedTypes = ["DATING", "GOT_WITH", "DATED"];
+  for (let i in acceptedTypes) {
+    if (relationshipsByType[acceptedTypes[i]]) {
+      infoHtml += `<h4>${acceptedTypes[i].replace("_", " ")}:</h4>`;
+      for (const rel of relationshipsByType[acceptedTypes[i]]) {
+        infoHtml += /*html*/ `<li><div class="flex">
+                              <b style='flex: 2'>${rel.p2}</b>
+                              <button class='delete-button' data-p1="${rel.p1}" data-p2="${rel.p2}" data-relationship="${rel.relationship}" id="delete-relationship">Delete</button>
+                              </div></li>`;
+      }
     }
   }
+
+  // Show all relationships (including ones that are not GOT_WITH, DATED, DATING)
+  // for (const [key, value] of Object.entries(relationshipsByType)) {
+  //   infoHtml += `<h4>${key.replace("_", " ")}:</h4>`;
+  //   for (const rel of value) {
+  //     infoHtml += /*html*/ `<li><b>${rel.p2}</b></li>`;
+  //   }
+  // }
 
   // data.relationships.forEach((rel) => {
   //   infoHtml += /*html*/ `<li>${rel.p1} <b>${rel.relationship.replace(
@@ -97,8 +111,6 @@ async function getResultsDisplayed(name, resultId) {
                 <form id="add-new-relationship-form"> 
                 <select id="relationship-context" required>
                   <option value="" disabled>Select Relationship</option>
-                  <option value="FRIENDS_WITH">Friends With</option>
-                  <option value="DONT_LIKE">Don't Like</option>
                   <option value="GOT_WITH" selected>Got With</option>
                   <option value="DATED">Dated</option>
                   <option value="DATING">Dating</option>
@@ -118,6 +130,24 @@ async function getResultsDisplayed(name, resultId) {
   results.innerHTML = infoHtml;
   results.style.display = "block";
   fetchAndPopulateDatalist("p3", "p3-list");
+
+  const deleteButton = document.getElementById("delete-relationship");
+  if (deleteButton) {
+    deleteButton.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const p1 = e.target.dataset.p1;
+      const relationship = e.target.dataset.relationship;
+      const p2 = e.target.dataset.p2;
+
+      if (await deleteRelationship(p1, relationship, p2)) {
+        fetchAndDraw();
+        getResultsDisplayed(name, resultId);
+      } else {
+        alert(JSON.stringify(response));
+      }
+    });
+  }
+
   document
     .getElementById("submit-relationship-menu")
     .addEventListener("click", async (e) => {
@@ -135,6 +165,18 @@ async function getResultsDisplayed(name, resultId) {
         alert(JSON.stringify(response));
       }
     });
+}
+
+async function deleteRelationship(p1, relationship, p2) {
+  const dataJson = await fetch("/delete_relationship", {
+    method: "POST",
+    body: JSON.stringify({ p1, relationship, p2 }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((data) => data.json());
+
+  return dataJson;
 }
 
 async function addNewRelationship(p1, relationship, p2) {
