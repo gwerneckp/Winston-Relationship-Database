@@ -1,5 +1,10 @@
 async function fetchGraphData() {
-  const response = await fetch('/graph_data');
+  const response = await fetch("/graph_data", {
+    credentials: "same-origin",
+    headers: {
+      "X-CSRF-TOKEN": getCookie("csrf_access_token"),
+    },
+  });
   const data = await response.json();
   const nodes = data.nodes.map((label, id) => ({ id, label }));
   const edges = data.edges.map((edge) => ({

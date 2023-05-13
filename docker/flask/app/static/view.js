@@ -1,5 +1,10 @@
 async function getResultsDisplayed(name, resultId) {
-  const response = await fetch(`/get_person_info?name=${name}`);
+  const response = await fetch(`/get_person_info?name=${name}`, {
+    credentials: "same-origin",
+    headers: {
+      "X-CSRF-TOKEN": getCookie("csrf_access_token"),
+    },
+  });
   const data = await response.json();
   let infoHtml = `<h2>${data.person.name}</h2>`;
   for (const [key, value] of Object.entries(data.person)) {
@@ -45,15 +50,17 @@ async function getResultsDisplayed(name, resultId) {
 }
 
 document.getElementById("submit-suggestion").onclick = async () => {
-  const suggestion = document.getElementById("suggestion").value;
+  const message = document.getElementById("suggestion").value;
 
   const response = await fetch(`/suggest`, {
+    credentials: "same-origin",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-CSRF-TOKEN": getCookie("csrf_access_token"),
     },
-    body: JSON.stringify({ suggestion }),
-  })
+    body: JSON.stringify({ message }),
+  });
 
   const suggestionStatus = document.getElementById("suggestion-status");
   if (response.status === 200) {

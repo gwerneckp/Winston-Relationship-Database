@@ -10,6 +10,7 @@ app = Flask(__name__,
 # Replace with your own secret key
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_COOKIE_SECURE'] = False
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=3)
 
 jwt = JWTManager(app)
@@ -159,6 +160,22 @@ def graph_data():
                 {"from": p1, "to": p2, "label": relationship, "arrows": "to;from"})
 
     return jsonify({"nodes": nodes, "edges": edges})
+
+
+@app.route('/suggestion', methods=['POST'])
+def suggestion():
+    message = request.json.get('message', None)
+    ip = request.remote_addr
+    user_agent = request.headers.get('User-Agent')
+    if suggestion:
+        cypherquery = 'CREATE (s:Suggestion {message: $message, ip: $ip, user_agent: $user_agent})'
+
+        api.execute_query(cypherquery, message=message,
+                          ip=ip, user_agent=user_agent)
+
+        return jsonify({"status": 201, "message": "Suggestion created"}), 201
+
+    return jsonify({"status": 400, "message": "No message provided"}), 400
 
 
 if __name__ == '__main__':

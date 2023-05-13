@@ -1,13 +1,27 @@
+function getCookie(name) {
+  var start = document.cookie.indexOf(name + "=");
+  var len = start + name.length + 1;
+  if (!start && name != document.cookie.substring(0, name.length)) {
+    return null;
+  }
+  if (start == -1) return null;
+  var end = document.cookie.indexOf(";", len);
+  if (end == -1) end = document.cookie.length;
+  return unescape(document.cookie.substring(len, end));
+}
+
 document
   .getElementById("create-person-form")
   .addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("person-name").value;
     await fetch("/create_person", {
+      credentials: "same-origin",
       method: "POST",
       body: JSON.stringify({ name }),
       headers: {
         "Content-Type": "application/json",
+        "X-CSRF-TOKEN": getCookie("csrf_access_token"),
       },
     });
     alert("Person created");
@@ -21,10 +35,12 @@ document
     const relationship = document.getElementById("relationship").value;
     const p2 = document.getElementById("p2").value;
     await fetch("/create_relationship", {
+      credentials: "same-origin",
       method: "POST",
       body: JSON.stringify({ p1, relationship, p2 }),
       headers: {
         "Content-Type": "application/json",
+        "X-CSRF-TOKEN": getCookie("csrf_access_token"),
       },
     })
       .then((data) => data.json())
@@ -51,7 +67,12 @@ document
   });
 
 async function getResultsDisplayed(name, resultId) {
-  const response = await fetch(`/get_person_info?name=${name}`);
+  const response = await fetch(`/get_person_info?name=${name}`, {
+    credentials: "same-origin",
+    headers: {
+      "X-CSRF-TOKEN": getCookie("csrf_access_token"),
+    },
+  });
   const data = await response.json();
   let infoHtml = `<h2>${data.person.name}</h2>`;
   for (const [key, value] of Object.entries(data.person)) {
@@ -169,10 +190,12 @@ async function getResultsDisplayed(name, resultId) {
 
 async function deleteRelationship(p1, relationship, p2) {
   const dataJson = await fetch("/delete_relationship", {
+    credentials: "same-origin",
     method: "POST",
     body: JSON.stringify({ p1, relationship, p2 }),
     headers: {
       "Content-Type": "application/json",
+      "X-CSRF-TOKEN": getCookie("csrf_access_token"),
     },
   }).then((data) => data.json());
 
@@ -181,10 +204,12 @@ async function deleteRelationship(p1, relationship, p2) {
 
 async function addNewRelationship(p1, relationship, p2) {
   const dataJson = await fetch("/create_relationship", {
+    credentials: "same-origin",
     method: "POST",
     body: JSON.stringify({ p1, relationship, p2 }),
     headers: {
       "Content-Type": "application/json",
+      "X-CSRF-TOKEN": getCookie("csrf_access_token"),
     },
   }).then((data) => data.json());
 
@@ -197,7 +222,12 @@ async function fetchAndPopulateDatalist(inputId, listId) {
 
   input.addEventListener("input", async () => {
     const searchName = input.value;
-    const response = await fetch(`/search?name=${searchName}`);
+    const response = await fetch(`/search?name=${searchName}`, {
+      headers: {
+        "X-CSRF-TOKEN": getCookie("csrf_access_token"),
+      },
+      credentials: "same-origin",
+    });
     const data = await response.json();
     const persons = data.persons;
 
