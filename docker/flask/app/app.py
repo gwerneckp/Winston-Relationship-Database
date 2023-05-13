@@ -12,6 +12,10 @@ api = NeoHandler('neo4j://neo4j:7687', 'neo4j', 'xxxxxxxx')
 def index():
     return render_template('index.html')
 
+@app.route('/disclaimer')
+def disclaimer():
+    return render_template('disclaimer.html')
+
 
 @app.route('/create_person', methods=['POST'])
 def create_person():
