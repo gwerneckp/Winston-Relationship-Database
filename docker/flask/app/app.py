@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, render_template, request
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, set_access_cookies, get_jwt_identity, get_jwt
+from flask import Flask, jsonify, render_template, request, redirect
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, set_access_cookies, get_jwt_identity, unset_jwt_cookies
 from functools import wraps
 from neo4j_utils import NeoHandler
 from datetime import datetime, timedelta
@@ -32,6 +32,14 @@ api = NeoHandler('neo4j://neo4j:7687', 'neo4j', 'xxxxxxxx')
 @app.route('/login')
 def login():
     return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    resp = redirect('/')
+    unset_jwt_cookies(resp)
+
+    return resp
 
 
 @app.route('/auth', methods=['POST'])

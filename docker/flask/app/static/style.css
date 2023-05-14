@@ -1,3 +1,11 @@
+:root {
+  --brand-primary: #2b2e4a;
+  --brand-secondary: #3e426a;
+  --brand-background: #181a2a;
+  --brand-text: #e6e6e6;
+  --brand-accent: #51568a;
+}
+
 * {
   box-sizing: border-box;
 }
