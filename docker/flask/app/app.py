@@ -7,8 +7,7 @@ from datetime import datetime, timedelta
 app = Flask(__name__,
             static_folder="./static",
             template_folder="./templates")
-# Replace with your own secret key
-app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+app.config['JWT_SECRET_KEY'] = 'X#h9#3mD$mE641nl77re'
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_SECURE'] = False
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=3)
