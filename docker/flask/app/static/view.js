@@ -49,7 +49,7 @@ async function getResultsDisplayed(name, resultId) {
       infoHtml += `<h4>${acceptedTypes[i].replace("_", " ")}:</h4>`;
       for (const rel of relationshipsByType[acceptedTypes[i]]) {
         infoHtml += /*html*/ `<li>
-                                <b style='flex: 2'>${rel.p2}</b>
+                                <b style='flex: 2'>${nameFormatted(rel.p2)}</b>
                                 </li>`;
       }
     }
@@ -60,7 +60,6 @@ async function getResultsDisplayed(name, resultId) {
   const results = document.getElementById(resultId);
   results.innerHTML = infoHtml;
   results.style.display = "block";
-  fetchAndPopulateDatalist("p3", "p3-list");
 }
 
 document.getElementById("submit-suggestion").onclick = async () => {

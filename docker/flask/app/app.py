@@ -1,8 +1,11 @@
-from flask import Flask, jsonify, render_template, request, redirect
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, set_access_cookies, get_jwt_identity, unset_jwt_cookies
-from functools import wraps
-from neo4j_utils import NeoHandler
 from datetime import datetime, timedelta
+from functools import wraps
+
+from flask import Flask, jsonify, redirect, render_template, request
+from flask_jwt_extended import (JWTManager, create_access_token,
+                                get_jwt_identity, jwt_required,
+                                set_access_cookies, unset_jwt_cookies)
+from neo4j_utils import NeoHandler
 
 app = Flask(__name__,
             static_folder="./static",
@@ -22,6 +25,7 @@ def requires_edit_permission(func):
         if current_user:
             if current_user.get('permissions') != 'edit':
                 return jsonify({'message': 'Insufficient permissions'}), 403
+
         return func(*args, **kwargs)
     return decorated_function
 
@@ -33,6 +37,7 @@ def requires_view_permission(func):
         if current_user:
             if current_user.get('permissions') not in ['view', 'edit']:
                 return jsonify({'message': 'Insufficient permissions'}), 403
+
         return func(*args, **kwargs)
     return decorated_function
 
@@ -46,7 +51,7 @@ def access():
 
     if code == 'church_churchill':
         access_token = create_access_token(identity={
-            'username': 'guest',
+            'user': 'guest',
             'permissions': 'view'
         })
 
@@ -67,7 +72,7 @@ def authenticate():
     result = api.execute_query(query, username=username, password=password)
     if result:
         access_token = create_access_token(identity={
-            'username': username,
+            'user': username,
             'permissions': 'edit'
         })
 
@@ -178,6 +183,18 @@ def get_person_info():
 @jwt_required(optional=True)
 @requires_view_permission
 def graph_data():
+    def splitLabel(label: str, maxLen: int = 20):
+        result: str = ''
+        splitLabel = label.replace('-', ' ').split(' ')
+        thisLineCount = 0
+        for split in splitLabel:
+            if thisLineCount + len(split) > maxLen:
+                result += '\n'
+                thisLineCount = 0
+            result += split + ' '
+            thisLineCount += len(split) + 1
+        return result
+
     query = '''
     MATCH (p1)-[r]->(p2)
     WHERE type(r) IN ['GOT_WITH', 'DATED', 'DATING']
@@ -189,8 +206,8 @@ def graph_data():
 
     if results is not None:
         for record in results:
-            p1 = record["p1"]
-            p2 = record["p2"]
+            p1 = splitLabel(record["p1"])
+            p2 = splitLabel(record["p2"])
             relationship = record["relationship"]
 
             if p1 not in nodes:
@@ -213,11 +230,10 @@ def graph_data():
 @requires_view_permission
 def suggestion():
     message = request.json.get('message', None)
-    ip = request.remote_addr
     user_agent = request.headers.get('User-Agent')
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if suggestion:
-        cypherquery = 'CREATE (s:Suggestion {message: $message, ip: $ip, user_agent: $user_agent, timestamp: $timestamp})'
+        cypherquery = 'CREATE (s:Suggestion {message: $message, user_agent: $user_agent, timestamp: $timestamp})'
 
         api.execute_query(cypherquery, message=message,
                           ip=ip, user_agent=user_agent, timestamp=timestamp)
