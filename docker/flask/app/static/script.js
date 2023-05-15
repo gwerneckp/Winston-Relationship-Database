@@ -74,7 +74,7 @@ async function getResultsDisplayed(name, resultId) {
     },
   });
   const data = await response.json();
-  let infoHtml = `<h2>${data.person.name}</h2>`;
+  let infoHtml = `<h2 id="context-name">${data.person.name}</h2>`;
   for (const [key, value] of Object.entries(data.person)) {
     if (key !== "name") {
       infoHtml += `<p>${
@@ -177,7 +177,7 @@ async function getResultsDisplayed(name, resultId) {
         "relationship-context"
       ).value;
       const p2 = document.getElementById("p3").value;
-      const p1 = name;
+      const p1 = document.getElementById("context-name").innerText;
       const response = await addNewRelationship(p1, relationship, p2);
       if (response.status == 201) {
         fetchAndDraw();

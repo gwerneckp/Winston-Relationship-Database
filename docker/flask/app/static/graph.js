@@ -6,15 +6,34 @@ async function fetchGraphData() {
     },
   });
   const data = await response.json();
-  const nodes = data.nodes.map((label, id) => ({ id, label }));
+  const nodes = data.nodes.map((label, id) => ({
+    id: id,
+    label: splitLabel(label, 15),
+    data: { name: label },
+  }));
   const edges = data.edges.map((edge) => ({
-    from: nodes.findIndex((node) => node.label === edge.from),
-    to: nodes.findIndex((node) => node.label === edge.to),
+    from: nodes.findIndex((node) => node.data.name === edge.from),
+    to: nodes.findIndex((node) => node.data.name === edge.to),
     label: edge.label,
     arrows: "from;to",
   }));
 
   return { nodes, edges };
+}
+function splitLabel(label, maxLen = 20) {
+  let result = "";
+  let splitLabel = label.replace("-", " ").split(" ");
+  let thisLineCount = 0;
+  for (let i = 0; i < splitLabel.length; i++) {
+    let split = splitLabel[i];
+    if (thisLineCount + split.length > maxLen) {
+      result += "\n";
+      thisLineCount = 0;
+    }
+    result += split + " ";
+    thisLineCount += split.length + 1;
+  }
+  return result.trim();
 }
 
 function drawGraph(nodes, edges) {
@@ -91,7 +110,7 @@ function drawGraph(nodes, edges) {
   network.on("click", async (params) => {
     if (params.nodes.length > 0) {
       const nodeId = params.nodes[0];
-      const nodeName = network.body.data.nodes.get(nodeId).label;
+      const nodeName = network.body.data.nodes.get(nodeId).data.name;
       getResultsDisplayed(nodeName, "context-menu");
     }
   });

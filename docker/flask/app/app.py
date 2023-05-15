@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 from functools import wraps
 
@@ -25,6 +26,26 @@ def requires_edit_permission(func):
         if current_user:
             if current_user.get('permissions') != 'edit':
                 return jsonify({'message': 'Insufficient permissions'}), 403
+
+        # get request important data
+        req = {
+            'headers': dict(request.headers),
+            'method': request.method,
+            'params': dict(request.args),
+            'body': request.json,
+        }
+
+        # stringfy dict to json for neo4j
+        req = json.dumps(req)
+
+        cypher_query = '''
+        MATCH (u:User {username: $username})
+        CREATE (l:Log {endpoint: $endpoint, timestamp: $timestamp, req: $req})
+        CREATE (u)-[:SENT]->(l)
+        '''
+
+        api.execute_query(cypher_query, username=current_user.get(
+            'user'), endpoint=request.endpoint, timestamp=datetime.now().isoformat(), req=req)
 
         return func(*args, **kwargs)
     return decorated_function
@@ -183,18 +204,6 @@ def get_person_info():
 @jwt_required(optional=True)
 @requires_view_permission
 def graph_data():
-    def splitLabel(label: str, maxLen: int = 20):
-        result: str = ''
-        splitLabel = label.replace('-', ' ').split(' ')
-        thisLineCount = 0
-        for split in splitLabel:
-            if thisLineCount + len(split) > maxLen:
-                result += '\n'
-                thisLineCount = 0
-            result += split + ' '
-            thisLineCount += len(split) + 1
-        return result
-
     query = '''
     MATCH (p1)-[r]->(p2)
     WHERE type(r) IN ['GOT_WITH', 'DATED', 'DATING']
@@ -206,8 +215,8 @@ def graph_data():
 
     if results is not None:
         for record in results:
-            p1 = splitLabel(record["p1"])
-            p2 = splitLabel(record["p2"])
+            p1 = record["p1"]
+            p2 = record["p2"]
             relationship = record["relationship"]
 
             if p1 not in nodes:

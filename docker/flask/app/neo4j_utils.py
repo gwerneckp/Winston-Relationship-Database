@@ -40,6 +40,7 @@ class NeoHandler:
     def relationship(self, p1: str, relationship: str, p2: str):
         valid_relationships = ['FRIENDS_WITH',
                                'DONT_LIKE', 'GOT_WITH', 'DATED', 'DATING']
+        
         if relationship not in valid_relationships:
             raise ValueError(f"Invalid relationship type: {relationship}")
 
