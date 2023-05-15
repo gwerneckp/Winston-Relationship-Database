@@ -10,7 +10,7 @@ app = Flask(__name__,
 app.config['JWT_SECRET_KEY'] = 'X#h9#3mD$mE641nl77re'
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_SECURE'] = False
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=3)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 
 jwt = JWTManager(app)
 
@@ -19,8 +19,20 @@ def requires_edit_permission(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         current_user = get_jwt_identity()
-        if current_user.get('permissions') != 'edit':
-            return jsonify({'message': 'Insufficient permissions'}), 403
+        if current_user:
+            if current_user.get('permissions') != 'edit':
+                return jsonify({'message': 'Insufficient permissions'}), 403
+        return func(*args, **kwargs)
+    return decorated_function
+
+
+def requires_view_permission(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        current_user = get_jwt_identity()
+        if current_user:
+            if current_user.get('permissions') not in ['view', 'edit']:
+                return jsonify({'message': 'Insufficient permissions'}), 403
         return func(*args, **kwargs)
     return decorated_function
 
@@ -28,17 +40,22 @@ def requires_edit_permission(func):
 api = NeoHandler('neo4j://neo4j:7687', 'neo4j', 'xxxxxxxx')
 
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
+@app.route('/access', methods=['POST'])
+def access():
+    code = request.json.get('code', None)
 
+    if code == 'church_churchill':
+        access_token = create_access_token(identity={
+            'username': 'guest',
+            'permissions': 'view'
+        })
 
-@app.route('/logout')
-def logout():
-    resp = redirect('/')
-    unset_jwt_cookies(resp)
+        resp = jsonify({'access_token': access_token})
+        set_access_cookies(resp, access_token)
 
-    return resp
+        return resp, 200
+
+    return jsonify({'message': 'Invalid code'}), 401
 
 
 @app.route('/auth', methods=['POST'])
@@ -62,6 +79,19 @@ def authenticate():
     return jsonify({'message': 'Invalid credentials'}), 401
 
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    resp = redirect('/')
+    unset_jwt_cookies(resp)
+
+    return resp
+
+
 @app.route('/')
 @app.route('/index')
 @jwt_required(optional=True)
@@ -70,7 +100,10 @@ def index():
     if jwt:
         if jwt['permissions'] == 'edit':
             return render_template('index.html')
-    return render_template('view.html')
+        if jwt['permissions'] == 'view':
+            return render_template('view.html')
+
+    return render_template('access_code.html')
 
 
 @app.route('/disclaimer')
@@ -121,6 +154,8 @@ def delete_relationship():
 
 
 @app.route('/search', methods=['GET'])
+@jwt_required(optional=True)
+@requires_view_permission
 def search_person():
     name = request.args.get('name', '')
     result = api.search(name)
@@ -128,6 +163,8 @@ def search_person():
 
 
 @app.route('/get_person_info', methods=['GET'])
+@jwt_required(optional=True)
+@requires_view_permission
 def get_person_info():
     name = request.args.get('name', '')
     try:
@@ -138,6 +175,8 @@ def get_person_info():
 
 
 @app.route('/graph_data', methods=['GET'])
+@jwt_required(optional=True)
+@requires_view_permission
 def graph_data():
     query = '''
     MATCH (p1)-[r]->(p2)
@@ -170,6 +209,8 @@ def graph_data():
 
 
 @app.route('/suggestion', methods=['POST'])
+@jwt_required(optional=True)
+@requires_view_permission
 def suggestion():
     message = request.json.get('message', None)
     ip = request.remote_addr

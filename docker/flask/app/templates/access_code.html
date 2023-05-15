@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authenticate</title>
+    <title>Access Page</title>
 
     <link rel="stylesheet" href="/static/style.css" />
 
@@ -15,7 +15,7 @@
         margin: 0;
         padding: 0;
       }
-      
+
       .flex {
         display: flex;
         align-items: center;
@@ -37,56 +37,48 @@
   </head>
   <body>
     <div class="flex container">
-      <form>
-        <h1>Login</h1>
-
-        <input
-          id="username"
-          type="text"
-          name="username"
-          placeholder="Username"
-        />
-        <br /><br />
-        <input
-          id="password"
-          type="password"
-          name="password"
-          placeholder="Password"
-        />
-        <br /><br />
+      <form action="/access" method="post">
+        <h1>Access Website</h1>
+        <h2>Why an access code?</h2>
         <p>
-          By entering the application, you acknowledge to have read the
-          disclaimer <a href="/disclaimer">here</a>
+          This website is password-protected to ensure the security and privacy
+          of the data it contains. We understand the importance of limiting
+          access to the graph until we implement a more robust confidentiality
+          system. Any information about yourself that you do not wish to have on
+          the website will be promptly removed without further questions.
         </p>
-        <br />
+        <p>
+          However, it's worth noting that since there are multiple contributors,
+          there is a possibility that the infomration will be added back. Until
+          we develop a foolproof system to prevent this, the website will remain
+          password-protected.
+        </p>
+        <input id="code" type="text" name="code" placeholder="Access Code" />
         <div style="background-color: #d69494; color: white" id="error"></div>
-        <button id="submit" value="Login">Login</button>
+        <button type="submit" id="submit" value="Login">Submit</button>
       </form>
     </div>
   </body>
-
   <script type="text/javascript">
     document.getElementById("submit").addEventListener("click", handleSubmit);
     function handleSubmit(e) {
       e.preventDefault();
 
-      var username = document.getElementById("username").value;
-      var password = document.getElementById("password").value;
+      var code = document.getElementById("code").value;
 
-      // /auth endpoint
+      // /access endpoint
       // check status code
-      fetch("/auth", {
+      fetch("/access", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: username, password: password }),
+        body: JSON.stringify({ code: code }),
       }).then((response) => {
         if (response.status == 200) {
           window.location.href = "/";
         } else {
-          document.getElementById("error").innerHTML =
-            "Invalid username or password";
+          document.getElementById("error").innerHTML = "Invalid code";
         }
       });
     }
