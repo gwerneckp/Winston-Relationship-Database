@@ -52,7 +52,7 @@ class NeoHandler:
         return bool(result)
 
     def delete_relationship(self, p1: str, relationship: str, p2: str):
-        cypher_query = f"MATCH (p1:Person {{name: $p1}})-[r:{relationship}]->(p2:Person {{name: $p2}}) " \
+        cypher_query = f"MATCH (p1:Person {{name: $p1}})<-[r:{relationship}]->(p2:Person {{name: $p2}}) " \
             f"DELETE r " \
             f"RETURN type(r)"
 
