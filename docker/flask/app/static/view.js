@@ -18,12 +18,14 @@ async function getResultsDisplayed(name, resultId) {
     },
   });
   const data = await response.json();
-  let infoHtml = `<h2>${data.person.name}</h2>`;
+  let infoHtml = `<h2>${nameFormatted(data.person.name)}</h2>`;
   for (const [key, value] of Object.entries(data.person)) {
     if (key !== "name") {
-      infoHtml += `<p>${
-        key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()
-      }: <b>${value}</b></p>`;
+      if (key !== 'school' && key !== 'email') {
+        infoHtml += `<p>${
+          key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()
+        }: <b>${value}</b></p>`;
+      }
     }
   }
   infoHtml += `<h3>Relationships:</h3>
@@ -84,3 +86,17 @@ document.getElementById("submit-suggestion").onclick = async () => {
     suggestionStatus.style.backgroundColor = "#d69494";
   }
 };
+
+function nameFormatted(name) {
+  const nameSplit = name.split(" ");
+  const firstName = nameSplit[0];
+
+  return (
+    firstName +
+    " " +
+    nameSplit
+      .slice(1, nameSplit.length)
+      .map((name) => name[0] + ".")
+      .join(" ")
+  );
+}
