@@ -94,9 +94,9 @@ class NeoHandler:
         return {"person": person_properties, "relationships": relationships}
 
     def search(self, name: str):
-        cypher_query = "MATCH (p:Person) WHERE toLower(p.name) CONTAINS toLower($name) RETURN p.name"
+        cypher_query = "CALL db.index.fulltext.queryNodes('personNames', $name) YIELD node RETURN node.name"
         result = self.execute_query(cypher_query, name=name)
-        return [record["p.name"] for record in result]
+        return [record["node.name"] for record in result]
 
 
 if __name__ == '__main__':

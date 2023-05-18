@@ -245,7 +245,7 @@ def suggestion():
         cypherquery = 'CREATE (s:Suggestion {message: $message, user_agent: $user_agent, timestamp: $timestamp})'
 
         api.execute_query(cypherquery, message=message,
-                          ip=ip, user_agent=user_agent, timestamp=timestamp)
+                          user_agent=user_agent, timestamp=timestamp)
 
         return jsonify({"status": 201, "message": "Suggestion created"}), 201
 
