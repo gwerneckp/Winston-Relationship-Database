@@ -188,16 +188,47 @@ def search_person():
     return jsonify({"persons": result})
 
 
+# @app.route('/get_person_info', methods=['GET'])
+# @jwt_required(optional=True)
+# @requires_view_permission
+# def get_person_info():
+#     name = request.args.get('name', '')
+#     try:
+#         result = api.get_person_info(name)
+#         return jsonify(result)
+#     except Exception as e:
+#         return jsonify({"status": 400, "message": str(e)}), 400
+
 @app.route('/get_person_info', methods=['GET'])
 @jwt_required(optional=True)
 @requires_view_permission
 def get_person_info():
     name = request.args.get('name', '')
-    try:
-        result = api.get_person_info(name)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"status": 400, "message": str(e)}), 400
+    cypher_query = '''
+    MATCH (p1:Person {name: $name})
+    OPTIONAL MATCH (p1)<-[r]->(p2:Person)
+    RETURN p1, type(r) as type, p2
+    '''
+    result = api.execute_query(cypher_query, name=name)
+
+    if not result or result[0]["p1"] is None:
+        return jsonify({"status": 404, "message": "Person not found"}), 404
+
+    # Extract person properties
+    person_node = result[0]["p1"]
+    person_properties = dict(person_node)
+
+    # Extract relationships
+    relationships = []
+    for record in result:
+        if record["type"] is not None and record["p2"] is not None:
+            p1 = record["p1"]["name"]
+            relationship = record["type"]
+            p2 = record["p2"]["name"]
+            relationships.append(
+                {"p1": p1, "relationship": relationship, "p2": p2})
+
+    return jsonify({"person": person_properties, "relationships": relationships})
 
 
 @app.route('/graph_data', methods=['GET'])

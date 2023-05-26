@@ -22,22 +22,22 @@ services:
       start_period: 10s
       retries: 5
 
-  flask:
-    build:
-      context: ./docker/flask
-      dockerfile: Dockerfile
-    volumes:
-      - ./docker/flask/app:/app
-    depends_on:
-      neo4j:
-        condition: service_healthy
+  # flask:
+  #   build:
+  #     context: ./docker/flask
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./docker/flask/app:/app
+  #   depends_on:
+  #     neo4j:
+  #       condition: service_healthy
 
-  nginx:
-    build:
-      context: ./docker/nginx
-      dockerfile: Dockerfile
-    ports:
-      - 80:80
-      - 443:443
-    depends_on:
-      - flask
+  # nginx:
+  #   build:
+  #     context: ./docker/nginx
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   depends_on:
+  #     - flask
