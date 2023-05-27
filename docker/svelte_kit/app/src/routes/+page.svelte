@@ -1,19 +1,17 @@
 <script lang="ts">
 	import { client } from '$lib/apolloClient';
-	import { gql, useQuery } from '@apollo/client';
+	import { gql } from '@apollo/client';
 	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
 
 	const GET_PEOPLE = gql`
 		query {
-			people{
+			people {
 				name
 				grade
 			}
 		}
 	`;
 
-	// Create a writable Svelte store for the people data
 	let people: any = [];
 
 	onMount(async () => {
@@ -21,7 +19,6 @@
 		people = data.people;
 	});
 </script>
-
 
 {#each people as person}
 	<li>{person.name} - {person.grade}</li>

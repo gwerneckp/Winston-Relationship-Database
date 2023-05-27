@@ -9,7 +9,13 @@ import neo4j from 'neo4j-driver';
 const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'xxxxxxxx'));
 
 const typeDefs = gql`
-	type Person {
+	type Person
+		@auth(
+			rules: [
+				{ operations: [READ], roles: ["view"] }
+				{ operations: [READ, CREATE, UPDATE, DELETE], roles: ["admin"] }
+			]
+		) {
 		name: String!
 		school: String
 		grade: String
@@ -18,7 +24,14 @@ const typeDefs = gql`
 		dating: [Person!]! @relationship(type: "DATED", direction: OUT)
 	}
 
-	type User {
+	type User
+		@auth(
+			rules: [
+				{ operations: [READ], roles: ["view"] }
+				{ operations: [READ, UPDATE ], allow: { id: "$jwt.sub.id" } }
+				{ operations: [READ, CREATE, UPDATE, DELETE], roles: ["admin"] }
+			]
+		) {
 		id: ID @readonly
 		username: String!
 		password: String! @private
@@ -45,7 +58,11 @@ const User = ogm.model('User');
 
 const resolvers = {
 	Mutation: {
-		signIn: async (_root: any, { username, password }: { username: string; password: string }, { req, jwt, auth }: { req: any; jwt: any; auth: any }) => {
+		signIn: async (
+			_root: any,
+			{ username, password }: { username: string; password: string },
+			{ req }: { req: any; jwt: any; auth: any }
+		) => {
 			const [user] = await User.find({ where: { username } });
 
 			if (!user) {
