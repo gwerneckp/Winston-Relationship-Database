@@ -2,7 +2,7 @@ import { Neo4jGraphQL } from '@neo4j/graphql';
 import { OGM } from '@neo4j/graphql-ogm';
 import { Neo4jGraphQLAuthJWTPlugin } from '@neo4j/graphql-plugin-auth';
 import { ApolloServer, gql } from 'apollo-server-svelte-kit';
-import JWT from 'jsonwebtoken';
+import JWT, { type JwtPayload } from 'jsonwebtoken';
 
 import neo4j from 'neo4j-driver';
 
@@ -16,23 +16,26 @@ const typeDefs = gql`
 				{ operations: [READ, CREATE, UPDATE, DELETE], roles: ["admin"] }
 			]
 		) {
-		name: String!
+		id: ID @id
+		name: String! @unique
 		school: String
 		grade: String
-		gotWith: [Person!]! @relationship(type: "GOT_WITH", direction: OUT)
-		dated: [Person!]! @relationship(type: "DATED", direction: OUT)
-		dating: [Person!]! @relationship(type: "DATED", direction: OUT)
+		gotWith: [Person!]!
+			@relationship(type: "GOT_WITH", direction: OUT, queryDirection: UNDIRECTED_ONLY)
+		dated: [Person!]! @relationship(type: "DATED", direction: OUT, queryDirection: UNDIRECTED_ONLY)
+		dating: [Person!]!
+			@relationship(type: "DATING", direction: OUT, queryDirection: UNDIRECTED_ONLY)
 	}
 
 	type User
 		@auth(
 			rules: [
 				{ operations: [READ], roles: ["view"] }
-				{ operations: [READ, UPDATE ], allow: { id: "$jwt.sub.id" } }
+				{ operations: [READ, UPDATE], allow: { id: "$jwt.sub.id" } }
 				{ operations: [READ, CREATE, UPDATE, DELETE], roles: ["admin"] }
 			]
 		) {
-		id: ID @readonly
+		id: ID @id
 		username: String!
 		password: String! @private
 	}
@@ -110,10 +113,17 @@ const neoSchema = new Neo4jGraphQL({
 const server = new ApolloServer({
 	schema: await neoSchema.getSchema(),
 	context: ({ req }) => {
+		const jwtRaw = req.cookies.get('jwt') || req.request.headers.get('X-auth-token');
+		let jwt: JwtPayload | string | null;
+		try {
+			jwt = JWT.verify(jwtRaw, 'secret');
+		} catch (error) {
+			jwt = null;
+		}
 		return {
 			driver: driver,
 			req: req,
-			jwt: JWT.decode(req.cookies.get('jwt'))
+			jwt: jwt
 		};
 	}
 });

@@ -1,25 +1,14 @@
 <script lang="ts">
-	import { client } from '$lib/apolloClient';
-	import { gql } from '@apollo/client';
-	import { onMount } from 'svelte';
+	import Graph from './Graph.svelte';
+	import { focusedUserId } from '../focusedStore';
 
-	const GET_PEOPLE = gql`
-		query {
-			people {
-				name
-				grade
-			}
-		}
-	`;
-
-	let people: any = [];
-
-	onMount(async () => {
-		const { data } = await client.query({ query: GET_PEOPLE });
-		people = data.people;
+	let focused: string = 'none';
+	focusedUserId.subscribe((value) => {
+		focused = value;
 	});
 </script>
 
-{#each people as person}
-	<li>{person.name} - {person.grade}</li>
-{/each}
+<Graph />
+<div>
+	{focused}
+</div>
