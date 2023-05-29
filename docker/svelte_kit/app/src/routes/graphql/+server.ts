@@ -87,11 +87,18 @@ const resolvers = {
 						role: 'admin'
 					}
 				},
-				'secret'
+				'secret',
+				{
+					expiresIn: '3d'
+				}
 			);
 
+			const expirationDate = new Date();
+			expirationDate.setDate(expirationDate.getDate() + 3); // Add 3 days to the current date
+
 			req.cookies.set('jwt', token, {
-				httpOnly: true
+				httpOnly: true,
+				expires: expirationDate
 			});
 
 			return token;

@@ -68,7 +68,7 @@
 		const people = data.people;
 
 		// Set colors
-		const colors = ['#d9f99d', '#fde68a', '#fdba74', '#fca5a5'];
+		const colors = ['#d9f99d', '#fde68a', '#fdba74', '#fecaca', '#fca5a5'];
 
 		// Create nodes
 		nodes = people.map((person: Person) => ({
@@ -203,7 +203,7 @@
 			// Get all nodes connected to this node
 			const connectedNodes = connectedEdges.reduce((result: Node[], edge: Edge) => {
 				const connectedNode = edge.from === nodeId ? edge.to : edge.from;
-				const node = networkData.nodes.get(connectedNode);
+				const node = networkData.nodes.get(connectedNode || '');
 				if (node) {
 					return [...result, node];
 				}
@@ -211,19 +211,19 @@
 			}, []);
 
 			// Highlight all connected nodes and edges
-			networkData.nodes.update(
-				connectedNodes.map((node: Node) => ({
-					id: node.id,
-					color: '#F2F2F2'
-				}))
-			);
+			// networkData.nodes.update(
+			// 	connectedNodes.map((node: Node) => ({
+			// 		id: node.id,
+			// 		color: '#F2F2F2'
+			// 	}))
+			// );
 
-			networkData.edges.update(
-				connectedEdges.map((edge: Edge) => ({
-					id: edge.id,
-					color: 'white'
-				}))
-			);
+			// networkData.edges.update(
+			// 	connectedEdges.map((edge: Edge) => ({
+			// 		id: edge.id,
+			// 		color: 'white'
+			// 	}))
+			// );
 
 			focusedPersonId.set(nodeId);
 		});
