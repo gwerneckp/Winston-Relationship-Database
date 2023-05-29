@@ -3,7 +3,7 @@
 	import { gql } from '@apollo/client';
 	import { DataSet, Network } from 'vis-network/standalone';
 	import type { Edge, Node } from 'vis-network/standalone';
-	import { focusedUserId } from '../focusedStore';
+	import { focusedPersonId } from '../focusedPerson';
 
 	type Person = {
 		name: string;
@@ -35,7 +35,7 @@
 		return result.trim();
 	}
 
-	const GET_PEOPLE = gql`
+	const GET_PEOPLE_QUERY = gql`
 		query {
 			people(
 				where: {
@@ -63,7 +63,7 @@
 	let nodes: Node[] = [];
 	let edges: Edge[] = [];
 
-	client.query({ query: GET_PEOPLE }).then((result: any) => {
+	client.query({ query: GET_PEOPLE_QUERY }).then((result: any) => {
 		const data = result.data;
 		const people = data.people;
 
@@ -190,13 +190,44 @@
 
 		const network = new Network(container, networkData, options);
 
+		// If a person is focused, highlight their connections
 		network.on('selectNode', (params) => {
 			const nodeId = params.nodes[0];
-			const node = networkData.nodes.get(nodeId);
+			// const node = networkData.nodes.get(nodeId);
 
-			focusedUserId.set(nodeId);
+			// Get all edges connected to this node
+			const connectedEdges = networkData.edges.get({
+				filter: (edge: Edge) => edge.from === nodeId || edge.to === nodeId
+			});
+
+			// Get all nodes connected to this node
+			const connectedNodes = connectedEdges.reduce((result: Node[], edge: Edge) => {
+				const connectedNode = edge.from === nodeId ? edge.to : edge.from;
+				const node = networkData.nodes.get(connectedNode);
+				if (node) {
+					return [...result, node];
+				}
+				return result;
+			}, []);
+
+			// Highlight all connected nodes and edges
+			networkData.nodes.update(
+				connectedNodes.map((node: Node) => ({
+					id: node.id,
+					color: '#F2F2F2'
+				}))
+			);
+
+			networkData.edges.update(
+				connectedEdges.map((edge: Edge) => ({
+					id: edge.id,
+					color: 'white'
+				}))
+			);
+
+			focusedPersonId.set(nodeId);
 		});
 	});
 </script>
 
-<div class=" h-full w-full" id="network" />
+<div class="h-full w-full" id="network" />

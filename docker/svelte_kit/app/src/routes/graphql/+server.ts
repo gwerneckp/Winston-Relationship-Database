@@ -20,6 +20,7 @@ const typeDefs = gql`
 		name: String! @unique
 		school: String
 		grade: String
+		email: String
 		gotWith: [Person!]!
 			@relationship(type: "GOT_WITH", direction: OUT, queryDirection: UNDIRECTED_ONLY)
 		dated: [Person!]! @relationship(type: "DATED", direction: OUT, queryDirection: UNDIRECTED_ONLY)

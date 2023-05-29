@@ -1,14 +1,13 @@
 <script lang="ts">
 	import Graph from './Graph.svelte';
-	import { focusedUserId } from '../focusedStore';
-
-	let focused: string = 'none';
-	focusedUserId.subscribe((value) => {
-		focused = value;
-	});
+	import User from './User.svelte';
 </script>
 
-<Graph />
-<div>
-	{focused}
+<div class="flex h-full">
+	<div class="w-2/3 h-full">
+		<Graph />
+	</div>
+	<div class="w-1/3 h-full">
+		<User />
+	</div>
 </div>
