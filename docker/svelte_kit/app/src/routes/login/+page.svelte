@@ -2,35 +2,36 @@
 	import { client } from '$lib/apolloClient';
 	import { gql } from '@apollo/client';
 
-	let code: string = '';
+	let username: string;
+	let password: string;
+
 	let error: string;
 	let success: string;
 
-	const ACCESS_MUTATION = (code: string) => gql`
+	const LOGIN_MUTATION = (username: string, password: string) => gql`
 		mutation {
-            access(code: "${code}")
+            signIn(username: "${username}", password: "${password}")
         }
 	`;
 
 	const handleSubmit = () => {
 		success = '';
 		error = '';
-		if (!code) return;
 		client
 			.mutate({
-				mutation: ACCESS_MUTATION(code)
+				mutation: LOGIN_MUTATION(username, password)
 			})
 			.then((result) => {
-				if (result.data.access) {
+				if (result.data.signIn) {
 					success = 'Access granted';
-					document.cookie = `jwt=${result.data.access}; path=/`;
+					document.cookie = `jwt=${result.data.signIn}; path=/`;
 					window.location.href = '/';
 				} else {
-					error = 'Invalid access code';
+					error = 'Invalid credentials';
 				}
 			})
 			.catch((err) => {
-				error = 'Invalid access code';
+				error = 'Invalid credentials';
 			});
 	};
 </script>
@@ -38,7 +39,7 @@
 <div class="min-h-screen flex items-center justify-center">
 	<div class="bg-base-300 p-8 max-w-3xl w-full rounded-2xl shadow">
 		<form on:submit|preventDefault={handleSubmit} class="space-y-6">
-			<h1 class="text-3xl font-bold mb-4">Access Website</h1>
+			<h1 class="text-3xl font-bold mb-4">Admin Login</h1>
 			<div class="alert shadow-lg">
 				<div>
 					<svg
@@ -62,26 +63,30 @@
 				</div>
 			</div>
 
-			<h2 class="text-xl font-semibold mb-4">Why an access code?</h2>
+			<!-- <h2 class="text-xl font-semibold mb-4">Why an access code?</h2>
 			<p>
 				This website is password-protected to ensure the security and privacy of the data it
 				contains. We understand the importance of limiting access to the graph until we implement a
 				more robust confidentiality system. Any information about yourself that you do not wish to
 				have on the website will be promptly removed without further questions.
-			</p>
-			<p>
-				However, it's worth noting that since there are multiple contributors, there is a
-				possibility that the information will be added back. Until we develop a foolproof system to
-				prevent this, the website will remain password-protected.
-			</p>
+			</p> -->
 			<div class="flex">
 				<input
 					type="text"
-					bind:value={code}
-					placeholder="Access Code"
+					bind:value={username}
+					placeholder="Username"
 					class="input input-bordered w-full"
 				/>
 			</div>
+			<div class="flex">
+				<input
+					type="password"
+					bind:value={password}
+					placeholder="Password"
+					class="input input-bordered w-full"
+				/>
+			</div>
+
 			{#if error}
 				<div class="alert alert-error shadow-lg">
 					<div>
@@ -126,18 +131,10 @@
 					class="underline">here</a
 				>.
 			</p>
-			{#if code.length >= 1}
-				<button type="submit" on:click={handleSubmit} class="btn btn-accent w-full">
-					Submit
-				</button>
-			{:else}
-				<button type="submit" on:click={handleSubmit} class="btn btn-accent btn-disabled w-full">
-					Submit
-				</button>
-			{/if}
+			<button type="submit" on:click={handleSubmit} class="btn btn-accent w-full"> Submit </button>
 
 			<p class="text-center">
-				<a href="/login" class="underline">Admin Login</a>
+				<a href="/access" class="underline">Normal Access</a>
 			</p>
 		</form>
 	</div>
