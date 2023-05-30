@@ -33,6 +33,7 @@
 			.split('; ')
 			.find((row) => row.startsWith('jwt'))
 			?.split('=')[1];
+		
 
 		if (!rawJwt) {
 			console.log('No JWT found');

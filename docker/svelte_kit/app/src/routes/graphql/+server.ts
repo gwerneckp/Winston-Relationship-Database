@@ -52,6 +52,7 @@ const typeDefs = gql`
 
 	type Mutation {
 		signIn(username: String!, password: String!): String!
+		access(code: String!): String!
 	}
 `;
 
@@ -69,7 +70,7 @@ const resolvers = {
 		signIn: async (
 			_root: any,
 			{ username, password }: { username: string; password: string },
-			{ req }: { req: any; jwt: any; auth: any }
+			{ req }: { req: any }
 		) => {
 			const [user] = await User.find({ where: { username } });
 
@@ -89,6 +90,40 @@ const resolvers = {
 						id: user.id,
 						username: user.username,
 						role: 'admin'
+					}
+				},
+				'secret',
+				{
+					expiresIn: '3d'
+				}
+			);
+
+			const expirationDate = new Date();
+			expirationDate.setDate(expirationDate.getDate() + 3); // Add 3 days to the current date
+
+			req.cookies.set('jwt', token, {
+				httpOnly: true,
+				expires: expirationDate
+			});
+
+			return token;
+		},
+
+		access: async (_root: any, { code }: { code: string }, { req }: { req: any }) => {
+			if (!code) {
+				throw new Error(`No token provided!`);
+			}
+
+			if (code !== 'secret') {
+				throw new Error(`Invalid token!`);
+			}
+
+			const token = JWT.sign(
+				{
+					sub: {
+						id: 'guest',
+						username: 'guest',
+						role: 'view'
 					}
 				},
 				'secret',
