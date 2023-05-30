@@ -35,8 +35,9 @@
 			?.split('=')[1];
 
 		if (!rawJwt) {
+			console.log('No JWT found');
 			window.location.href = '/access';
-			// console.error('No JWT found')
+			return;
 			// console.log(rawJwt)
 		}
 
@@ -44,8 +45,8 @@
 
 		// redirect to login if not logged in
 		if (!jwt?.payload) {
+			console.error('No JWT payload found');
 			window.location.href = '/access';
-			// console.error('No JWT payload found');
 			// console.log(jwt);
 		}
 

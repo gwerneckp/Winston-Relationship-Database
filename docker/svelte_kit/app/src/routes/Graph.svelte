@@ -7,14 +7,18 @@
 
 	type Person = {
 		name: string;
+		id: string;
 		gotWith: {
 			name: string;
+			id: string;
 		}[];
 		dated: {
 			name: string;
+			id: string;
 		}[];
 		dating: {
 			name: string;
+			id: string;
 		}[];
 	};
 
@@ -47,14 +51,18 @@
 				}
 			) {
 				name
+				id
 				gotWith {
 					name
+					id
 				}
 				dated {
 					name
+					id
 				}
 				dating {
 					name
+					id
 				}
 			}
 		}
@@ -72,7 +80,7 @@
 
 		// Create nodes
 		nodes = people.map((person: Person) => ({
-			id: person.name,
+			id: person.id,
 			label: splitLabel(person.name),
 			// number of connections
 			color:
@@ -87,20 +95,20 @@
 		// Create edges
 		edges = people.reduce((result: Edge[], person: Person) => {
 			const gotWithEdges = person.gotWith.map((gotWithPerson) => ({
-				from: person.name,
-				to: gotWithPerson.name,
+				from: person.id,
+				to: gotWithPerson.id,
 				arrows: 'to;from',
 				color: '#fecdd3'
 			}));
 			const datedEdges = person.dated.map((datedPerson) => ({
-				from: person.name,
-				to: datedPerson.name,
+				from: person.id,
+				to: datedPerson.id,
 				arrows: 'to;from',
 				color: '#ddd6fe'
 			}));
 			const datingEdges = person.dating.map((datingPerson) => ({
-				from: person.name,
-				to: datingPerson.name,
+				from: person.id,
+				to: datingPerson.id,
 				arrows: 'to;from',
 				color: '#5eead4'
 			}));

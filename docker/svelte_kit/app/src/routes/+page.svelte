@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Auth from '$lib/components/Auth.svelte';
 	import Graph from './Graph.svelte';
-	import User from './User.svelte';
+	import FocusedUser from './FocusedUser.svelte';
 </script>
 
 <Auth>
@@ -10,7 +10,7 @@
 			<Graph />
 		</div>
 		<div class="w-1/3 h-full">
-			<User />
+			<FocusedUser />
 		</div>
 	</div>
 </Auth>

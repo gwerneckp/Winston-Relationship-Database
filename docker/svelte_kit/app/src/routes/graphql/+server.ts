@@ -33,7 +33,7 @@ const typeDefs = gql`
 			rules: [
 				{ operations: [READ], roles: ["view"] }
 				{ operations: [READ, UPDATE], allow: { id: "$jwt.sub.id" } }
-				{ operations: [READ, CREATE, UPDATE, DELETE], roles: ["admin"] }
+				{ operations: [READ, CREATE, UPDATE, DELETE, CONNECT, DISCONNECT], roles: ["admin"] }
 			]
 		) {
 		id: ID @id
@@ -44,6 +44,10 @@ const typeDefs = gql`
 	type Query {
 		people: [Person]
 		users: [User]
+		searchPeople(name: String!): [Person]
+			@cypher(
+				statement: "CALL db.index.fulltext.queryNodes('personNames', $name) YIELD node RETURN node"
+			)
 	}
 
 	type Mutation {
@@ -139,3 +143,5 @@ const server = new ApolloServer({
 await server.start();
 
 export const POST = server.handleRequest;
+export const GET = server.handleRequest;
+export const OPTIONS = server.handleRequest;
