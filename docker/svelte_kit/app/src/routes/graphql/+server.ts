@@ -1,5 +1,6 @@
 import { Neo4jGraphQL, Neo4jGraphQLSubscriptionsSingleInstancePlugin } from '@neo4j/graphql';
 import { OGM } from '@neo4j/graphql-ogm';
+//import ConstraintDirective from 'graphql-constraint-directive';
 import { Neo4jGraphQLAuthJWTPlugin } from '@neo4j/graphql-plugin-auth';
 import { ApolloServer, gql } from 'apollo-server-svelte-kit';
 import JWT, { type JwtPayload } from 'jsonwebtoken';
@@ -16,10 +17,11 @@ const typeDefs = gql`
 		#	]
 		#) {
 		id: ID @id
-		name: String! @unique
-		school: String
-		grade: String
-		email: String
+		name: String! @unique #@constraint(minLength: 1, maxLength: 255)
+		school: String #@constraint(minLength: 1, maxLength: 255)
+		email: String #@constraint(format: "email", maxLength: 255)
+		grade: String #@constraint(pattern: "^Y[0-9]{1,2}$")
+		anonymous: Boolean
 		gotWith: [Person!]!
 			@relationship(type: "GOT_WITH", direction: OUT, queryDirection: UNDIRECTED_ONLY)
 		dated: [Person!]! @relationship(type: "DATED", direction: OUT, queryDirection: UNDIRECTED_ONLY)

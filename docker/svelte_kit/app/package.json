@@ -42,6 +42,7 @@
 		"@neo4j/graphql-plugin-auth": "^2.2.0",
 		"apollo-server-svelte-kit": "^3.10.0",
 		"graphql": "^16.6.0",
+		"graphql-constraint-directive": "^5.1.1",
 		"graphql-tag": "^2.12.6",
 		"jsonwebtoken": "^9.0.0",
 		"neo4j-driver": "^5.9.0",

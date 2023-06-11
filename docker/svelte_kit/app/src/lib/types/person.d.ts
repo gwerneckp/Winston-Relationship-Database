@@ -4,6 +4,7 @@ export type Person = {
 	grade: string;
 	school: string;
 	email: string;
+	anonymous: boolean;
 	gotWith: Person[];
 	dated: Person[];
 	dating: Person[];

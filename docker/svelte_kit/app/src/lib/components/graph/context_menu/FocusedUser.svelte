@@ -15,6 +15,7 @@
 				grade
 				school
                 email
+				anonymous
 				gotWith {
 					name
 					id
