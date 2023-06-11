@@ -5,6 +5,9 @@
 
 <!-- UI for admin -->
 {#if focusedPerson}
+	<div class="bg-base-200 p-4">
+		<h1 class="text-2xl font-bold">Person Information</h1>
+	</div>
 	<div class="p-4 bg-base-300 h-full">
 		<h1 class="text-2xl font-bold mb-2">{focusedPerson.name}</h1>
 		<p class="text-content">Grade: {focusedPerson.grade}</p>

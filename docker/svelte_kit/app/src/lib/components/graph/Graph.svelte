@@ -226,9 +226,8 @@
 
 	createGraph();
 	addEventListener('data_change', (event: any) => {
-		console.log('data_change', event.detail);
 		createGraph();
 	});
 </script>
 
-<div class="h-full w-full bg-base-100" bind:this={container} id="network" />
+<div class="h-full w-full bg-base-300" bind:this={container} id="network" />

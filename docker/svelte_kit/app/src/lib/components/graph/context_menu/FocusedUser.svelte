@@ -55,7 +55,7 @@
 	});
 </script>
 
-<div class="w-full h-full">
+<div class="w-full h-full rounded-xl">
 	<Role>
 		<PersonAdmin slot="admin" focusedPerson={personData} />
 		<PersonView slot="view" focusedPerson={personData} />

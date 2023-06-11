@@ -1,23 +1,15 @@
 <script lang="ts">
 	import type { Person } from '$lib/types/person';
 	import Id from '../Id.svelte';
-	import SearchPerson from '../SearchPerson.svelte';
-	import RemoveRelationship from './RemoveRelationship.svelte';
+	import AddRelationship from '$lib/components/graph/context_menu/admin_view/AddRelationship.svelte';
+	import RemoveRelationship from '$lib/components/graph/context_menu/admin_view/RemoveRelationship.svelte';
 	export let focusedPerson: Person;
-
-	let searchResult: Person[] = [];
-	let addRelationshipType: string;
-	function addRelationshipHandler(
-		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-	) {
-		throw new Error('Function not implemented.');
-	}
 </script>
 
 <!-- UI for admin -->
 {#if focusedPerson}
-	<div class="bg-base-200 p-4">
-		<h1 class="text-2xl font-bold">Admin Dashboard</h1>
+	<div class="bg-base-200">
+		<h1 class="text-2xl font-bold p-4">Admin Dashboard</h1>
 	</div>
 	<div class="px-4 pt-4 bg-base-300 h-full">
 		<h1 class="font-bold flex items-center">
@@ -88,25 +80,7 @@
 			{/if}
 		{/each}
 
-		<div class="mt-4">
-			<h2 class="text-xl font-bold mb-2">Add Relationship</h2>
-
-			<select
-				bind:value={addRelationshipType}
-				required
-				class="select select-bordered select-sm w-full"
-			>
-				<option value="" disabled>Select Relationship</option>
-				<option value="GOT WITH" selected>Got With</option>
-				<option value="DATED">Dated</option>
-				<option value="DATING">Dating</option>
-			</select>
-			<div class="pt-3" />
-			<SearchPerson bind:searchResult />
-			<div class="pt-3" />
-
-			<button class="btn btn-sm w-full" on:click={addRelationshipHandler}>Add Relationship</button>
-		</div>
+		<AddRelationship person1Id={focusedPerson.id} />
 	</div>
 {:else}
 	<p>Loading...</p>
