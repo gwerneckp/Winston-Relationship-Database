@@ -1,21 +1,20 @@
-import { Neo4jGraphQL } from '@neo4j/graphql';
+import { Neo4jGraphQL, Neo4jGraphQLSubscriptionsSingleInstancePlugin } from '@neo4j/graphql';
 import { OGM } from '@neo4j/graphql-ogm';
 import { Neo4jGraphQLAuthJWTPlugin } from '@neo4j/graphql-plugin-auth';
 import { ApolloServer, gql } from 'apollo-server-svelte-kit';
 import JWT, { type JwtPayload } from 'jsonwebtoken';
-
 import neo4j from 'neo4j-driver';
 
-const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'xxxxxxxx'));
+const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'churchill2018'));
 
 const typeDefs = gql`
-	type Person
-		@auth(
-			rules: [
-				{ operations: [READ], roles: ["view"] }
-				{ operations: [READ, CREATE, UPDATE, DELETE], roles: ["admin"] }
-			]
-		) {
+	type Person {
+		#@auth(
+		#	rules: [
+		#		{ operations: [READ], roles: ["view"] }
+		#		{ operations: [READ, CREATE, UPDATE, DELETE, CONNECT, DISCONNECT], roles: ["admin"] }
+		#	]
+		#) {
 		id: ID @id
 		name: String! @unique
 		school: String
@@ -150,6 +149,7 @@ const neoSchema = new Neo4jGraphQL({
 	driver: driver,
 	resolvers: resolvers,
 	plugins: {
+		subscriptions: new Neo4jGraphQLSubscriptionsSingleInstancePlugin(),
 		auth: new Neo4jGraphQLAuthJWTPlugin({
 			secret: 'secret',
 			rolesPath: 'sub.role'

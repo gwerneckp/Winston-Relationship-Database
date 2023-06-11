@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { client } from '$lib/apolloClient';
-	import { focusedPersonId } from '../focusedPerson';
-	import { gql } from '@apollo/client';
-	import Role from '$lib/components/Role.svelte';
+	import Role from '$lib/components/auth/Role.svelte';
+	import PersonView from '$lib/components/graph/context_menu/user_view/PersonView.svelte';
+	import PersonAdmin from '$lib/components/graph/context_menu/admin_view/PersonAdmin.svelte';
+	import { focusedPersonId } from '$lib/stores/focusedStore';
 	import type { Person } from '$lib/types/person';
-	import PersonAdmin from './PersonAdmin.svelte';
-	import PersonView from './PersonView.svelte';
+	import { gql } from '@apollo/client';
 
 	const GET_PERSON_QUERY = (id: string) => gql`
 		query {
@@ -43,11 +43,21 @@
 				personData = result.data.people[0];
 			});
 	});
+
+	addEventListener('data_change', (event: any) => {
+		client
+			.query({
+				query: GET_PERSON_QUERY(focused)
+			})
+			.then((result) => {
+				personData = result.data.people[0];
+			});
+	});
 </script>
 
 <div class="w-full h-full">
 	<Role>
-		<PersonAdmin slot="admin" {personData} />
-		<PersonView slot="view" {personData} />
+		<PersonAdmin slot="admin" focusedPerson={personData} />
+		<PersonView slot="view" focusedPerson={personData} />
 	</Role>
 </div>
