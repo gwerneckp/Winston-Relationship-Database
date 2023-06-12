@@ -98,7 +98,7 @@
 
 		<div class="py-1" />
 		{#if suggestionSuccess}
-			<div transition:fade={{ duration: 100 }} class="py-3">
+			<div transition:fade={{ duration: 100 }} class="py-2">
 				<div class="alert alert-success p-3">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"

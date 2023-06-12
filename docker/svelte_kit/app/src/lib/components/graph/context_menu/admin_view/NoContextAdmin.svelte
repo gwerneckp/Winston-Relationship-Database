@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SearchPerson from '$lib/components/graph/context_menu/SearchPerson.svelte';
+	import AddPerson from '$lib/components/graph/context_menu/admin_view/AddPerson.svelte';
 	import { fade } from 'svelte/transition';
 	import { gql } from '@apollo/client';
 	import { client } from '$lib/apolloClient';
@@ -95,9 +96,10 @@
 	{/if}
 
 	<div class="py-3" />
-
-	<h2 class="text-xl font-bold">Suggestions</h2>
-	<div class="py-1" />
+	{#if suggestions.length > 1}
+		<h2 class="text-xl font-bold">Suggestions</h2>
+		<div class="py-1" />
+	{/if}
 	{#each suggestions as suggestion}
 		<div class=" p-2 bg-base-100 rounded-lg">
 			<p class="font-bold">{suggestion.date}</p>
@@ -112,4 +114,21 @@
 			</div>
 		</div>
 	{/each}
+
+	<h2 class="text-xl font-bold">Notice</h2>
+	<div class="py-1" />
+	<p>
+		This database is designed to track relationships between individuals within the school
+		community. Please <b>do not log relationships with random people from outside of school</b>,
+		that one dude you met at UCPA last summer should not be here.
+	</p>
+	<br />
+	<p>
+		Please <b>do not log about people in Year 10 or bellow.</b> The database should include only information
+		about lycéean students.
+	</p>
+
+	<div class="py-3" />
+	<h2 class="text-xl font-bold">Add Person</h2>
+	<AddPerson />
 </div>
