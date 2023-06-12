@@ -51,6 +51,8 @@ const typeDefs = gql`
 		) {
 		id: ID @id
 		suggestion: String!
+		date: DateTime! @timestamp(operations: [CREATE])
+		dealtWith: Boolean! @default(value: false)
 	}
 
 	type Query {

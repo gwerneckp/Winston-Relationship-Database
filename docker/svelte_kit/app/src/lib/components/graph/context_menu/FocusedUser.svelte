@@ -6,7 +6,8 @@
 	import { focusedPersonId } from '$lib/stores/focusedStore';
 	import type { Person } from '$lib/types/person';
 	import { gql } from '@apollo/client';
-	import NoContext from './NoContext.svelte';
+	import NoContext from '$lib/components/graph/context_menu/user_view/NoContext.svelte';
+	import NoContextAdmin from '$lib/components/graph/context_menu/admin_view/NoContextAdmin.svelte';
 
 	const GET_PERSON_QUERY = (id: string) => gql`
 		query {
@@ -59,11 +60,14 @@
 
 <div class="w-full h-full rounded-xl">
 	{#if personData}
-	<Role>
-		<PersonAdmin slot="admin" focusedPerson={personData} />
-		<PersonView slot="view" focusedPerson={personData} />
-	</Role>
+		<Role>
+			<PersonAdmin slot="admin" focusedPerson={personData} />
+			<PersonView slot="view" focusedPerson={personData} />
+		</Role>
 	{:else}
-	<NoContext />
+		<Role>
+			<NoContextAdmin slot="admin" />
+			<NoContext slot="view" />
+		</Role>
 	{/if}
 </div>
