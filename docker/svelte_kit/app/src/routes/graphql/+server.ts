@@ -42,9 +42,21 @@ const typeDefs = gql`
 		password: String! @private
 	}
 
+	type Suggestion
+		@auth(
+			rules: [
+				{ operations: [CREATE], roles: ["view"], allow: { user: { id: "$jwt.sub.id" } } }
+				{ operations: [READ, CREATE, UPDATE, DELETE, CONNECT, DISCONNECT], roles: ["admin"] }
+			]
+		) {
+		id: ID @id
+		suggestion: String!
+	}
+
 	type Query {
 		people: [Person]
 		users: [User]
+		suggestions: [Suggestion]
 		searchPeople(name: String!): [Person]
 			@cypher(
 				statement: "CALL db.index.fulltext.queryNodes('personNames', $name) YIELD node RETURN node"
