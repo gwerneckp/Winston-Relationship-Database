@@ -142,4 +142,12 @@
 			>
 		{/if}
 	</div>
+
+	<div class="py-3" />
+
+	<div>
+		<h2 class="text-xl font-bold">Admin Access</h2>
+		<div class="py-1" />
+		<p>Do you have administrator credentials? Login <a class="underline" href="/login">here</a>.</p>
+	</div>
 </div>

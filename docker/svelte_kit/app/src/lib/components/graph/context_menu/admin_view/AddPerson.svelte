@@ -31,7 +31,7 @@
 					success = `Successfully added person ${name}.`;
 					error = '';
 
-                    focusedPersonId.set(result.data.createPeople.people[0].id);
+					focusedPersonId.set(result.data.createPeople.people[0].id);
 					setTimeout(() => {
 						success = '';
 					}, 3000);

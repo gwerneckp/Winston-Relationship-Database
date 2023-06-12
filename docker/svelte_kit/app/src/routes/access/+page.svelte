@@ -53,7 +53,7 @@
 					/></svg
 				>
 				<span
-					>New churchillweb update! Visit the old version <a href="https://dev.churchillweb.uk"
+					>New churchillweb update! Visit the old version <a class='underline' href="https://dev.churchillweb.uk"
 						>here</a
 					>.
 				</span>
