@@ -184,6 +184,14 @@
 
 			const network = new Network(container, networkData, options);
 
+			// When click on graph but not on a node
+			network.on('click', (params) => {
+				if (params.nodes.length === 0) {
+					network.unselectAll();
+					focusedPersonId.set('');
+				}
+			});
+
 			// If a person is focused, highlight their connections
 			network.on('selectNode', (params) => {
 				const nodeId = params.nodes[0];
@@ -230,4 +238,7 @@
 	});
 </script>
 
+<div class="bg-base-200 p-4">
+	<h1 class="text-2xl font-bold">Graph</h1>
+</div>
 <div class="h-full w-full bg-base-300" bind:this={container} id="network" />

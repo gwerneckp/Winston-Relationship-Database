@@ -28,12 +28,12 @@
 		return token;
 	}
 
+	let user: userData;
 	onMount(() => {
 		const rawJwt = document.cookie
 			.split('; ')
 			.find((row) => row.startsWith('jwt'))
 			?.split('=')[1];
-		
 
 		if (!rawJwt) {
 			console.log('No JWT found');
@@ -51,9 +51,15 @@
 			// console.log(jwt);
 		}
 
-		const user = jwt?.payload?.sub as userData;
+		user = jwt?.payload?.sub as userData;
 		userStore.set(user);
 	});
 </script>
 
-<slot />
+{#if user}
+	<slot />
+{:else}
+	<div class="h-full w-full flex justify-center items-center">
+		<span class="loading loading-spinner loading-lg" />
+	</div>
+{/if}

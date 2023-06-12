@@ -9,13 +9,13 @@ import neo4j from 'neo4j-driver';
 const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'churchill2018'));
 
 const typeDefs = gql`
-	type Person {
-		#@auth(
-		#	rules: [
-		#		{ operations: [READ], roles: ["view"] }
-		#		{ operations: [READ, CREATE, UPDATE, DELETE, CONNECT, DISCONNECT], roles: ["admin"] }
-		#	]
-		#) {
+	type Person
+		@auth(
+			rules: [
+				{ operations: [READ], roles: ["view"] }
+				{ operations: [READ, CREATE, UPDATE, DELETE, CONNECT, DISCONNECT], roles: ["admin"] }
+			]
+		) {
 		id: ID @id
 		name: String! @unique #@constraint(minLength: 1, maxLength: 255)
 		school: String #@constraint(minLength: 1, maxLength: 255)
