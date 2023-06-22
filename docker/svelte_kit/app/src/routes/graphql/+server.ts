@@ -6,7 +6,7 @@ import { ApolloServer, gql } from 'apollo-server-svelte-kit';
 import JWT, { type JwtPayload } from 'jsonwebtoken';
 import neo4j from 'neo4j-driver';
 
-const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'churchill2018'));
+const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'churchill'));
 
 const typeDefs = gql`
 	type Person

@@ -4,7 +4,7 @@ import json
 import datetime
 
 driver = neo4j.GraphDatabase.driver(
-    "bolt://localhost:7687", auth=("neo4j", "churchill2018"))
+    "bolt://localhost:7687", auth=("neo4j", "churchill"))
 
 # execute query match all
 

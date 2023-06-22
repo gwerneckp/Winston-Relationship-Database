@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { client } from '$lib/apolloClient';
 	import Role from '$lib/components/auth/Role.svelte';
-	import PersonView from '$lib/components/graph/context_menu/user_view/PersonView.svelte';
+	import PersonView from '$lib/components/graph/context_menu/PersonView.svelte';
 	import PersonAdmin from '$lib/components/graph/context_menu/admin_view/PersonAdmin.svelte';
 	import { focusedPersonId } from '$lib/stores/focusedStore';
 	import type { Person } from '$lib/types/person';

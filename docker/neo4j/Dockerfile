@@ -1,7 +1,7 @@
 FROM neo4j:4.3.2
 
 # Set environment variables
-ENV NEO4J_AUTH=neo4j/xxxxxxxx \
+ENV NEO4J_AUTH=neo4j/churchill \
     NEO4J_dbms_directories_data=/data
 
 # Expose the ports that Neo4j uses
