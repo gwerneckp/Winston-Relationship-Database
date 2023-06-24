@@ -40,6 +40,7 @@
 		"@neo4j/graphql": "^3.20.0",
 		"@neo4j/graphql-ogm": "^3.20.0",
 		"@neo4j/graphql-plugin-auth": "^2.2.0",
+		"@sveltejs/adapter-node": "^1.2.4",
 		"apollo-server-svelte-kit": "^3.10.0",
 		"graphql": "^16.6.0",
 		"graphql-constraint-directive": "^5.1.1",

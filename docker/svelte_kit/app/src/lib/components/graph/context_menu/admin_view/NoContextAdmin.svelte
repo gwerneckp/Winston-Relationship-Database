@@ -22,7 +22,7 @@
 		query {
 			suggestions(where: { dealtWith: false }) {
 				id
-				suggestion
+				message
 				date
 				dealtWith
 			}
@@ -35,6 +35,7 @@
 				query: GET_SUGGESTIONS_QUERY()
 			})
 			.then((result) => {
+				console.log(result);
 				suggestions = result.data.suggestions;
 			});
 	}
@@ -96,24 +97,36 @@
 	{/if}
 
 	<div class="py-3" />
+	<h2 class="text-xl font-bold">Add Person</h2>
+	<AddPerson />
+
+	<div class="py-3" />
 	{#if suggestions.length > 1}
 		<h2 class="text-xl font-bold">Suggestions</h2>
 		<div class="py-1" />
-	{/if}
-	{#each suggestions as suggestion}
-		<div class=" p-2 bg-base-100 rounded-lg">
-			<p class="font-bold">{suggestion.date}</p>
-			<Id id={suggestion.id} /> <br />
-			<div class="py-1" />
-			<div class="flex justify-between gap-3">
-				<p class="break-words">{suggestion.suggestion}</p>
+		<div class="h-60 overflow-y-auto">
+			{#each suggestions as suggestion}
+				<div class=" p-2 bg-base-100 rounded-lg">
+					<p class="font-bold">{suggestion.date}</p>
+					<Id id={suggestion.id} /> <br />
+					<div class="py-1" />
+					<div class="flex justify-between gap-3">
+						<p class="break-words">{suggestion.message}</p>
 
-				<button on:click={() => dealWithSuggestion(suggestion.id)} class="btn btn-sm btn-accent">
-					Dealt with
-				</button>
-			</div>
+						<button
+							on:click={() => dealWithSuggestion(suggestion.id)}
+							class="btn btn-sm btn-accent"
+						>
+							Dealt with
+						</button>
+					</div>
+				</div>
+				<div class="py-1" />
+			{/each}
 		</div>
-	{/each}
+	{/if}
+
+	<div class="py-3" />
 
 	<h2 class="text-xl font-bold">Notice</h2>
 	<div class="py-1" />
@@ -127,8 +140,4 @@
 		Please <b>do not log about people in Year 10 or bellow.</b> The database should include only information
 		about lycéean students.
 	</p>
-
-	<div class="py-3" />
-	<h2 class="text-xl font-bold">Add Person</h2>
-	<AddPerson />
 </div>

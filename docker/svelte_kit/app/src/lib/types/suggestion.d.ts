@@ -1,6 +1,6 @@
 export type Suggestion = {
 	id: string;
-	suggestion: string;
+	message: string;
 	date: string;
 	dealtWith: boolean;
 };

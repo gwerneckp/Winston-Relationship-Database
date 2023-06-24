@@ -36,6 +36,17 @@ services:
   #     neo4j:
   #       condition: service_healthy
 
+  # svelte_kit:
+  #   build:
+  #     context: ./docker/svelte_kit
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./docker/svelte-kit/app:/app
+  #   ports:
+  #     - 3000:3000
+    # depends_on:
+    #   - neo4j
+
   # nginx:
   #   build:
   #     context: ./docker/nginx
@@ -45,3 +56,5 @@ services:
   #     - 443:443
   #   depends_on:
   #     - flask
+
+  

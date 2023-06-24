@@ -55,7 +55,7 @@
 	<div class="w-3/5">
 		<p>{person2Name}</p>
 		<!-- <p class="text-sm text-gray-600">#{person1Id}</p> -->
-		<Id id={person1Id} />
+		<Id id={person2Id} />
 	</div>
 	<div class="w-2/5">
 		<button on:click={removeRelationshipHandler} class="btn btn-outline btn-error btn-sm"

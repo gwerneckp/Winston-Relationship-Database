@@ -21,6 +21,12 @@
 						key.slice(1, key.length).replace(/[A-Z]/g, (letter) => ` ${letter}`)}:
 				</h2>
 				{#each value as person}
+					<!-- <h1>
+						{person.name} - {person.id}
+					</h1>
+					<h1>
+						{focusedPerson.name} - {focusedPerson.id}
+					</h1> -->
 					<RemoveRelationship
 						person1Id={focusedPerson.id}
 						person2Id={person.id}

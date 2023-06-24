@@ -1,7 +1,9 @@
 import { Neo4jGraphQL, Neo4jGraphQLSubscriptionsSingleInstancePlugin } from '@neo4j/graphql';
-import { OGM } from '@neo4j/graphql-ogm';
+import OMGPkg from '@neo4j/graphql-ogm';
+const { OGM } = OMGPkg;
 //import ConstraintDirective from 'graphql-constraint-directive';
-import { Neo4jGraphQLAuthJWTPlugin } from '@neo4j/graphql-plugin-auth';
+import Neo4jGraphQLAuthJWTPluginPkg from '@neo4j/graphql-plugin-auth';
+const { Neo4jGraphQLAuthJWTPlugin } = Neo4jGraphQLAuthJWTPluginPkg;
 import { ApolloServer, gql } from 'apollo-server-svelte-kit';
 import JWT, { type JwtPayload } from 'jsonwebtoken';
 import neo4j from 'neo4j-driver';
@@ -50,7 +52,7 @@ const typeDefs = gql`
 			]
 		) {
 		id: ID @id
-		suggestion: String!
+		message: String!
 		date: DateTime! @timestamp(operations: [CREATE])
 		dealtWith: Boolean! @default(value: false)
 	}

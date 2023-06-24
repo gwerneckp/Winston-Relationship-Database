@@ -84,19 +84,19 @@
 					from: person.id,
 					to: gotWithPerson.id,
 					arrows: 'to;from',
-					color: '#fecdd3'
+					color: '#7cffd7'
 				}));
 				const datedEdges = person.dated.map((datedPerson) => ({
 					from: person.id,
 					to: datedPerson.id,
 					arrows: 'to;from',
-					color: '#ddd6fe'
+					color: '#ff7c7c'
 				}));
 				const datingEdges = person.dating.map((datingPerson) => ({
 					from: person.id,
 					to: datingPerson.id,
 					arrows: 'to;from',
-					color: '#5eead4'
+					color: '#ff7cc2'
 				}));
 
 				return [...result, ...gotWithEdges, ...datedEdges, ...datingEdges];

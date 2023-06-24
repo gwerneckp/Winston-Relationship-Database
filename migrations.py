@@ -1,7 +1,8 @@
-import neo4j
-from uuid import uuid4
-import json
 import datetime
+import json
+from uuid import uuid4
+
+import neo4j
 
 driver = neo4j.GraphDatabase.driver(
     "bolt://localhost:7687", auth=("neo4j", "churchill"))
@@ -18,6 +19,7 @@ def execute_query(query, **kwargs):
 def escape_quotes(string):
     return string.replace("'", "\\'")
 
+
 for person in execute_query("MATCH (p:Person) RETURN p.name"):
     result = execute_query(
         f"MATCH (p:Person) WHERE p.name = '{escape_quotes(person['p.name'])}' SET p.id = $id RETURN p.id", id=str(uuid4()))
@@ -26,7 +28,8 @@ for person in execute_query("MATCH (p:Person) RETURN p.name"):
     # set boolean property anonymous to false
     result2 = execute_query(
         f"MATCH (p:Person) WHERE p.name = '{escape_quotes(person['p.name'])}' SET p.anonymous = false RETURN p.anonymous")
-    print(f"Set anonymous for {person['p.name']} to {result2[0]['p.anonymous']}")
+    print(
+        f"Set anonymous for {person['p.name']} to {result2[0]['p.anonymous']}")
 
 for user in execute_query('MATCH (u:User) RETURN u.username'):
     result = execute_query(
@@ -37,7 +40,8 @@ for user in execute_query('MATCH (u:User) RETURN u.username'):
 for suggestion in execute_query('MATCH (s:Suggestion) RETURN s'):
     suggestion_data = suggestion['s']._properties
     suggestion_message = escape_quotes(suggestion_data['message'])
-    suggestion_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    suggestion_date = datetime.datetime.utcnow().isoformat(
+        timespec='microseconds') + '000Z'
     suggestion_id = str(uuid4())
     suggestion_dealt_with = False
 
@@ -48,5 +52,5 @@ for suggestion in execute_query('MATCH (s:Suggestion) RETURN s'):
         """
     )
 
-    print(f"Created suggestion with id {suggestion_id} and message {suggestion_message}")
-
+    print(
+        f"Created suggestion with id {suggestion_id} and message {suggestion_message}")

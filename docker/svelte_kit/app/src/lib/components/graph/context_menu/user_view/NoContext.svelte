@@ -21,13 +21,13 @@
 		mutation {
 			createSuggestions(
 				input: {
-					suggestion: "${suggestion}"
+					message: "${suggestion}"
 				}
 			) {
                 info{
                     nodesCreated
                 }
-			}
+			}	
 		}
 	`;
 
