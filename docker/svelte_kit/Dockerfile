@@ -1,9 +1,15 @@
-FROM node:18-alpine
+FROM node:18-alpine 
 
 WORKDIR /app
-RUN rm -rf ./*
-COPY --from=build /app/package.json .
-COPY --from=build /app/build .
-RUN npm install --omit=dev
 
-CMD ["node", "index.js"]
+RUN npm install
+RUN npm run build
+
+COPY ./build ./build
+COPY ./node_modules ./node_modules
+COPY ./package.json ./package.json
+COPY ./package-lock.json ./package-lock.json
+
+EXPOSE 3000
+
+CMD [ "node", "build/index.js" ]
