@@ -62,7 +62,7 @@
 			const people = data.people;
 
 			// Set colors
-			const colors = ['#d9f99d', '#fde68a', '#fdba74', '#fecaca', '#fca5a5'];
+			const colors = ['#d9f99d', '#fde68a', '#fdba74', '#fecaca', '#fca5a5', '#ffd4f9'];
 
 			// Create nodes
 			nodes = people.map((person: Person) => ({

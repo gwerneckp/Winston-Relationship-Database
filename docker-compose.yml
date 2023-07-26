@@ -20,7 +20,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1"
+          "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1",
         ]
       interval: 5s
       start_period: 10s
@@ -40,11 +40,7 @@ services:
     build:
       context: ./docker/svelte_kit
       dockerfile: Dockerfile
-      # target: build
-    volumes:
-      - ./docker/svelte_kit/app:/app
-    ports:
-      - 3000:3000
+      target: production
     depends_on:
       neo4j:
         condition: service_healthy
