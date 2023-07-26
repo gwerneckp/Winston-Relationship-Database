@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { userStore } from '$lib/stores/userStore';
 	import type { userData } from '$lib/stores/userStore';
+	import { userStore } from '$lib/stores/userStore';
+	import { onMount } from 'svelte';
 
 	type JWTData = {
 		raw?: string;
@@ -39,7 +39,6 @@
 			console.log('No JWT found');
 			window.location.href = '/access';
 			return;
-			// console.log(rawJwt)
 		}
 
 		const jwt = jwtDecode(rawJwt || '');
