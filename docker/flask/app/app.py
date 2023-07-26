@@ -63,7 +63,7 @@ def requires_view_permission(func):
     return decorated_function
 
 
-api = NeoHandler('neo4j://neo4j:7687', 'neo4j', 'xxxxxxxx')
+api = NeoHandler('neo4j://neo4j:7687', 'neo4j', 'churchill')
 
 
 @app.route('/access', methods=['POST'])
