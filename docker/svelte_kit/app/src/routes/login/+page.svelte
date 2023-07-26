@@ -56,7 +56,7 @@
 				<span
 					>New churchillweb update! Visit the old version <a
 						class="underline"
-						href="https://dev.churchillweb.uk">here</a
+						href="https://old.churchillweb.uk">here</a
 					>.
 				</span>
 			</div>
