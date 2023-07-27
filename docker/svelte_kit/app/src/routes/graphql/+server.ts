@@ -8,7 +8,9 @@ import JWT, { type JwtPayload } from 'jsonwebtoken';
 import neo4j from 'neo4j-driver';
 const { Neo4jGraphQLAuthJWTPlugin } = Neo4jGraphQLAuthJWTPluginPkg;
 
-const driver = neo4j.driver('bolt://neo4j:7687', neo4j.auth.basic('neo4j', 'churchill'));
+const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'churchill'));
+const ACCESSTOKEN = 'church_churchill';
+const SECRET = 'dmnawuqii239u2384nsd';
 
 const typeDefs = gql`
 	type Person
@@ -109,7 +111,7 @@ const resolvers = {
 						role: 'admin'
 					}
 				},
-				'secret',
+				SECRET,
 				{
 					expiresIn: '3d'
 				}
@@ -131,7 +133,7 @@ const resolvers = {
 				throw new Error(`No token provided!`);
 			}
 
-			if (code !== 'secret') {
+			if (code !== ACCESSTOKEN) {
 				throw new Error(`Invalid token!`);
 			}
 
@@ -143,7 +145,7 @@ const resolvers = {
 						role: 'view'
 					}
 				},
-				'secret',
+				SECRET,
 				{
 					expiresIn: '3d'
 				}
@@ -169,7 +171,7 @@ const neoSchema = new Neo4jGraphQL({
 	plugins: {
 		subscriptions: new Neo4jGraphQLSubscriptionsSingleInstancePlugin(),
 		auth: new Neo4jGraphQLAuthJWTPlugin({
-			secret: 'secret',
+			secret: SECRET,
 			rolesPath: 'sub.role'
 		})
 	}
@@ -181,7 +183,7 @@ const server = new ApolloServer({
 		const jwtRaw = req.cookies.get('jwt') || req.request.headers.get('X-auth-token');
 		let jwt: JwtPayload | string | null;
 		try {
-			jwt = JWT.verify(jwtRaw, 'secret');
+			jwt = JWT.verify(jwtRaw, SECRET);
 		} catch (error) {
 			jwt = null;
 		}

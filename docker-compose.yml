@@ -12,7 +12,7 @@ services:
       - ./data:/data
       - ./docker/neo4j/plugins:/plugins
     environment:
-      - NEO4J_AUTH=neo4j/churchill
+      - NEO4J_AUTH=neo4j/axP5GxoSa5
       - NEO4J_apoc_export_file_enabled=true
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_apoc_import_file_use__neo4j__config=true

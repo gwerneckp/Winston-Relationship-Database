@@ -2,13 +2,19 @@
 	import { client } from '$lib/apolloClient';
 	import { gql } from '@apollo/client';
 	import Id from '$lib/components/graph/context_menu/Id.svelte';
+	import { onMount } from 'svelte';
+	import { compute_rest_props } from 'svelte/internal';
 
 	export let person1Id: string;
 	export let person2Id: string;
 	export let person2Name: string;
 	export let relationship: string;
 
-	const REMOVE_RELATIONSHIP_MUTATION = gql`
+	const REMOVE_RELATIONSHIP_MUTATION = (
+		person1Id: string,
+		person2Id: string,
+		relationship: string
+	) => gql`
 			mutation {
 				updatePeople(
 					where: {
@@ -40,15 +46,24 @@
 	function removeRelationshipHandler(
 		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
 	) {
-		client.mutate({ mutation: REMOVE_RELATIONSHIP_MUTATION }).then((result) => {
-			const data_change = new CustomEvent('data_change', {
-				detail: {
-					relationshipsDeleted: result.data.updatePeople.info.relationshipsDeleted
-				}
+		console.log(person1Id, person2Id, relationship);
+		client
+			.mutate({ mutation: REMOVE_RELATIONSHIP_MUTATION(person1Id, person2Id, relationship) })
+			.then((result) => {
+				const data_change = new CustomEvent('data_change', {
+					detail: {
+						relationshipsDeleted: result.data.updatePeople.info.relationshipsDeleted
+					}
+				});
+				dispatchEvent(data_change);
 			});
-			dispatchEvent(data_change);
-		});
 	}
+
+	onMount(() => {
+		console.log(person1Id);
+		console.log(person2Id);
+		console.log(relationship);
+	});
 </script>
 
 <div class="flex">

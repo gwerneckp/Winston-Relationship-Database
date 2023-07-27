@@ -5,7 +5,7 @@ from uuid import uuid4
 import neo4j
 
 driver = neo4j.GraphDatabase.driver(
-    "bolt://localhost:7687", auth=("neo4j", "churchill"))
+    "bolt://localhost:7687", auth=("neo4j", "axP5GxoSa5#XC7"))
 
 # execute query match all
 
