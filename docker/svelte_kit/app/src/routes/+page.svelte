@@ -9,12 +9,11 @@
 <Auth>
 	<div class="text-3xl font-bold flex justify-center lg:p-6 p-6 lg:m-3 bg-base-200">
 		<div>
-			<p>Welcome to the Churchillweb Database</p>
+			<p class='text-center'>Welcome to the Churchillweb Database</p>
 			<Role>
-				<p slot="admin" class="text-2xl font-normal flex justify-center">
-					Hello&nbsp<span class="font-bold">{$userStore.username}</span>, You are logged in as
-					an&nbsp<span class="font-bold">{$userStore.role}</span>.
-				</p>
+				<div slot="admin" class="text-2xl font-normal text-center">
+					Hello <b>{$userStore.username}</b>, You are logged in as an <b>{$userStore.role}</b>.
+				</div>
 			</Role>
 		</div>
 	</div>
