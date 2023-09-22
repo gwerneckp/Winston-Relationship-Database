@@ -6,7 +6,7 @@ Churchill Web is a social graph application designed to map and visualize relati
 
 The project directory structure is organized as follows:
 
-\```
+```
 churchillweb/
 ├── docker/
 │ ├── flask/
@@ -17,7 +17,7 @@ churchillweb/
 ├── migrations.py
 ├── scripts/
 └── TODO.md
-\```
+```
 
 ## Prerequisites
 
@@ -34,24 +34,24 @@ To build the Docker containers for Churchill Web, follow these steps:
 
 1. Clone the repository to your local machine.
 
-\```bash
+```bash
 git clone <repository_url>
 cd churchillweb
-\```
+```
 
 2. Build the Docker containers using Docker Compose.
 
-\```bash
+```bash
 docker-compose build
-\```
+```
 
 ### Running the Application
 
 Once the containers are built, you can start the Churchill Web application with the following command:
 
-\```bash
+```bash
 docker-compose up
-\```
+```
 
 This command will start the following services:
 
@@ -84,6 +84,6 @@ Contributions to Churchill Web are welcome! If you'd like to contribute, please 
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-\---
+---
 
 Thank you for using Churchill Web! If you have any questions or encounter any issues, please don't hesitate to reach out to the project maintainers.
