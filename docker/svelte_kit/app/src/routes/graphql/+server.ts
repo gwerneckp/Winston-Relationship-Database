@@ -8,7 +8,7 @@ import JWT, { type JwtPayload } from 'jsonwebtoken';
 import neo4j from 'neo4j-driver';
 const { Neo4jGraphQLAuthJWTPlugin } = Neo4jGraphQLAuthJWTPluginPkg;
 
-const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', 'churchill'));
+const driver = neo4j.driver('bolt://neo4j:7687', neo4j.auth.basic('neo4j', 'churchill'));
 const ACCESSTOKEN = 'church_churchill';
 const SECRET = 'dmnawuqii239u2384nsd';
 

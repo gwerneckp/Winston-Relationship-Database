@@ -3,6 +3,8 @@ services:
   neo4j:
     image: neo4j:4.3.2
     ports:
+      - 7474:7474
+      - 7473:7473
       - 7687:7687
     volumes:
       - ./data:/data
@@ -23,10 +25,13 @@ services:
       retries: 5
 
   svelte_kit:
-    build:
-      context: ./docker/svelte_kit
-      dockerfile: Dockerfile
-      target: production
+    image: node:18-alpine
+    command: npm run dev -- --host
+    working_dir: /app
+    volumes:
+      - ./docker/svelte_kit/app:/app
+    ports:
+      - 5173:5173
     depends_on:
       neo4j:
         condition: service_healthy
